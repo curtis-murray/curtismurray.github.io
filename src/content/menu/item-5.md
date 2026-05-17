@@ -1,5 +1,5 @@
 ---
-name: "Contact"
-link: "/contact/"
-icon: "FaEnvelope"
+name: "Photos"
+link: "/photography/"
+icon: "FaCamera"
 ---

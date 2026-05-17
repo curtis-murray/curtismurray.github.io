@@ -2,18 +2,35 @@
 import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import Card from "../components/Card";
-import ProgressBar from "../components/ProgressBar";
 import Tag from "../components/Tag";
-const progressBar = await getCollection("progressBar");
 const education = await getCollection("education");
 const experience = await getCollection("experience");
 const knowledges = await getCollection("knowledges");
+const tools = [
+  "Python",
+  "Claude Code",
+  "MCP",
+  "PyTorch",
+  "HuggingFace",
+  "TensorFlow",
+  "Neo4j",
+  "AWS Bedrock",
+  "GCP",
+  "Docker",
+  "PostgreSQL",
+  "SQL",
+  "R",
+  "Bash",
+  "Git",
+  "Slurm HPC",
+  "LaTeX",
+];
 import { FaGraduationCap } from "react-icons/fa6";
 import { FaBriefcase } from "react-icons/fa";
 ---
 
 <Layout
-  title="Resume - Curtis Murray Data Science Statistics Research Clinical NLP Healthcare Text"
+  title="Resume — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
 >
   <!-- resume section start -->
   <div class="container mr-auto ml-auto sm:px-5 md:px-10 lg:px-14">
@@ -64,10 +81,12 @@ import { FaBriefcase } from "react-icons/fa";
   >
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
       <div class="col-span-1">
-        <h4 class="text-[1.625rem] dark:text-white font-medium mb-6">
-        Technical Skills
+        <h4 class="text-[1.625rem] dark:text-white font-medium mb-8">
+          Tech Stack
         </h4>
-        {progressBar.map((details) => <ProgressBar details={details} />)}
+        <div class="flex gap-y-5 gap-x-2.5 flex-wrap">
+          {tools.map((item) => <Tag tagName={item} />)}
+        </div>
       </div>
 
       <div class="col-span-1">

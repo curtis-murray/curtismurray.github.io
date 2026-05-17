@@ -1,5 +1,5 @@
 ---
-name: "Portfolio"
-link: "/portfolio/"
+name: "Projects"
+link: "/projects/"
 icon: "FaLaptopCode"
 ---

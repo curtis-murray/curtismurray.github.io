@@ -1,0 +1,66 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Portfolio from "../components/Portfolio";
+import { getCollection } from "astro:content";
+const works = await getCollection("works");
+const filters = await getCollection("portfolioFilters");
+---
+
+<Layout
+  title="Projects | Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
+>
+  <div class="container mr-auto ml-auto px-4 sm:px-5 md:px-10 lg:px-[60px]">
+    <div class="py-12">
+      <h2 class="relative inline-block text-[2.5rem] dark:text-white font-bold transform after:absolute after:md:w-[12rem] after:left-[10rem] after:h-0.5 after:bg-gradient-to-r after:from-btn-secondary after:to-btn-secondary after:content-[''] after:rounded-md after:top-2/4 after:transform">
+        Projects
+      </h2>
+    </div>
+
+    <!-- Featured projects (rich descriptions) -->
+    <div class="grid gap-6 grid-cols-1 mb-12">
+      <div class="rounded-2xl bg-light-bg-three dark:bg-transparent dark:border-2 dark:border-dark-border p-6 space-y-3">
+        <span class="text-tiny text-text-primary dark:text-main-text uppercase tracking-wide">2025 – Present · AI Engineer | Tech Founder · Neuro-Symbolic Agentic AI</span>
+        <h3 class="text-2xl dark:text-white font-medium">Spoken Tamil Morphology Analyser</h3>
+        <p class="text-text-primary dark:text-main-text leading-relaxed">
+          The first working computational morphological analyser for spoken Tamil. Spoken Tamil is highly agglutinative and non-standardised across dialects, with no canonical rules to unpack surface forms, a setting where direct LLM generation is unreliable. It runs a ReAct loop: the agent proposes a segmentation hypothesis, validates it against a ~1,000-node Neo4j knowledge graph via a custom MCP server, observes the structured feedback, and refines, iterating until the segmentation grounds to verified graph entities and reducing hallucination by constraining outputs to the graph.
+        </p>
+        <p class="text-text-primary dark:text-main-text leading-relaxed">
+          The MCP server exposes typed tools that return structured prose with embedded scores and IDs, roughly 3–5× cheaper per call than the JSON equivalent, and structured to keep the model reasoning over the evidence. Every tool call is written to a structured trajectory stream (latency, outcome, success), with automated graph-health invariant checks, giving per-run observability without an external eval framework. The graph itself was built via multi-agent adjudication over OCR'd reference material, with deduplication and edge-case handling across agents.
+        </p>
+        <p class="text-sm text-text-primary dark:text-main-text">
+          <span class="font-medium">Stack:</span> Python · TypeScript · Custom MCP server · Neo4j · LLM agent orchestration
+        </p>
+      </div>
+
+      <div class="rounded-2xl bg-light-bg-three dark:bg-transparent dark:border-2 dark:border-dark-border p-6 space-y-3">
+        <span class="text-tiny text-text-primary dark:text-main-text uppercase tracking-wide">2024 – 2025 · Clinical NLP at RMIT / UoM</span>
+        <h3 class="text-2xl dark:text-white font-medium">RAG Pipeline for Clinical Entity Linking</h3>
+        <p class="text-text-primary dark:text-main-text leading-relaxed">
+          Mapped free-text clinical mentions to ontology codes (DrugBank, RxNorm) by embedding ontology entities, retrieving candidates via similarity search, and adjudicating with an LLM. Direct LLM generation hallucinated codes about half the time, unacceptably dangerous in clinical settings. The retrieval-plus-adjudication pattern outperformed string matching, ClinicalBERT embeddings, and direct generation on F1, because constraining the LLM to choose between real candidates prevents it from inventing codes that don't exist.
+        </p>
+        <p class="text-text-primary dark:text-main-text leading-relaxed">
+          Added an LLM-driven query reformulation loop (e.g., brand → generic drug name) that measurably improved hit rates on hard cases. Built inside a regulated clinical data environment with governance and privacy constraints; presented to clinical stakeholders at MCBK 2024.
+        </p>
+        <p class="text-sm text-text-primary dark:text-main-text">
+          <span class="font-medium">Stack:</span> Python · ClinicalBERT · Vector search · LLM adjudication · Slurm HPC
+        </p>
+      </div>
+
+      <div class="rounded-2xl bg-light-bg-three dark:bg-transparent dark:border-2 dark:border-dark-border p-6 space-y-3">
+        <span class="text-tiny text-text-primary dark:text-main-text uppercase tracking-wide">2025 – Present · Tech Founder · Full-Stack EdTech</span>
+        <h3 class="text-2xl dark:text-white font-medium">Kathaivazhi: Tamil Language Learning Platform</h3>
+        <p class="text-text-primary dark:text-main-text leading-relaxed">
+          EdTech platform for Tamil diaspora learners. Click-to-analyse words with morphological breakdown via the morphological analyser above, spaced repetition, and learner progression tracking. Pre-launch.
+        </p>
+        <p class="text-sm text-text-primary dark:text-main-text">
+          <span class="font-medium">Stack:</span> React · Express · PostgreSQL · Neo4j
+        </p>
+      </div>
+    </div>
+
+    <!-- Apps & Talks (existing portfolio grid) -->
+    <h3 class="text-[28px] dark:text-white font-bold font-robotoSlab mb-6">Apps & Talks</h3>
+  </div>
+
+  <Portfolio portfolio={works} filters={filters} client:only />
+</Layout>

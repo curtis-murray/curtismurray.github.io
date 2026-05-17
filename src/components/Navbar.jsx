@@ -3,7 +3,7 @@ import * as Icon from "react-icons/fa";
 
 const Navbar = ({ activeMenuId, menuItems }) => {
   return (
-    <header className="lg:w-[560px] h-[144px] hidden lg:block p-[30px] ml-auto mb-10 rounded-[16px] bg-white dark:bg-dark-primary">
+    <header className="lg:w-[660px] h-[144px] hidden lg:block p-[30px] ml-auto mb-10 rounded-[16px] bg-white dark:bg-dark-primary">
       <nav className="hidden lg:block">
         <ul className="flex">
           {menuItems.map((item, index) => {

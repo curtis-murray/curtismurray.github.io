@@ -3,8 +3,10 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "tinacms dev -c 'astro dev'",
-    "start": "astro dev",
+    "dev": "tinacms dev -p 4001 -c 'astro dev --port 4321'",
+    "start": "npm run photos && astro dev",
+    "photos": "node scripts/photos.mjs",
+    "prebuild": "npm run photos",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
@@ -39,6 +41,7 @@
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-n": "^16.0.2",
     "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-react": "^7.33.2"
+    "eslint-plugin-react": "^7.33.2",
+    "sharp": "^0.34.5"
   }
 }

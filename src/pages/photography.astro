@@ -1,0 +1,11 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Photography from "../components/Photography";
+import photos from "../data/photography.json";
+---
+
+<Layout
+  title="Photography — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
+>
+  <Photography photos={photos} client:only />
+</Layout>

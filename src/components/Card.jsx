@@ -10,6 +10,11 @@ const Card = ({ details }) => {
       </span>
       <h3 className="text-xl dark:text-white">{details.data.title}</h3>
       <p className="dark:text-dark-text">{details.data.subTitle}</p>
+      {details.data.description && (
+        <p className="text-sm text-text-primary dark:text-main-text leading-relaxed pt-1">
+          {details.data.description}
+        </p>
+      )}
     </div>
   );
 };

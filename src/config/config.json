@@ -1,9 +1,9 @@
 {
   "site": {
-    "title": "Curtis Murray Data Science Statistics Research Clinical NLP Healthcare Text",
+    "title": "Curtis Murray — AI Engineer · Agentic AI · LLMs · RAG · MCP · Clinical NLP",
     "favicon": "/assets/logo/favicon.png"
   },
   "metadata": {
-    "meta_description": "Curtis Murray Data Science Statistics Research Clinical NLP Healthcare Text"
+    "meta_description": "Curtis Murray — AI Engineer building production agentic systems with custom MCP servers, RAG pipelines, and knowledge-graph grounding. PhD in Applied Mathematics (NLP)."
   }
 }

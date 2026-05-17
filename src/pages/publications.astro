@@ -3,17 +3,15 @@ import Layout from "../layouts/Layout.astro";
 import { getCollection } from "astro:content";
 import CardPub from "../components/CardPub";
 const publications = await getCollection("publications");
-const preprints = await getCollection("preprints");
-import { FaNewspaper, FaBoxArchive, FaBox } from "react-icons/fa";
+import { FaNewspaper } from "react-icons/fa";
 ---
 
 <Layout
-  title="Resume - Curtis Murray Data Science Statistics Research Clinical NLP Healthcare Text"
+  title="Publications — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
 >
   <!-- Pub section start -->
   <div class="container mr-auto ml-auto sm:px-5 md:px-10 lg:px-14">
     <div class="py-12 px-4 md:px-0">
-      <!-- resume page title -->
       <h2
         class="relative inline-block text-[2.5rem] dark:text-white font-bold transform after:absolute after:md:w-[12rem] after:left-[12rem] after:h-0.5 after:bg-gradient-to-r after:from-btn-secondary after:to-btn-secondary after:content-[''] after:rounded-md after:top-2/4 after:transform"
       >
@@ -22,20 +20,6 @@ import { FaNewspaper, FaBoxArchive, FaBox } from "react-icons/fa";
       <div
         class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-x-6 gap-y-6 mt-[30px]"
       >
-        <!-- publication start -->
-        <div>
-          <div class="flex items-center space-x-2 mb-4">
-            <span class="text-6xl text-light-icon">
-              <i class="fa-solid fa-box-archive"></i>
-              </span>
-            <h4 class="text-[1.625rem] dark:text-white font-medium">
-              Preprints
-            </h4>
-          </div>
-          {preprints.map((details) => <CardPub details={details} />)}
-        </div>
-        <!-- publication end -->  
-        <!-- Preprints start -->
         <div>
           <div class="flex items-center space-x-2 mb-4">
             <span class="text-6xl text-light-icon">
@@ -47,10 +31,7 @@ import { FaNewspaper, FaBoxArchive, FaBox } from "react-icons/fa";
           </div>
           {publications.map((details) => <CardPub details={details} />)}
         </div>
-        <!-- publication end -->
-
-        </div>
+      </div>
     </div>
   </div>
-  <!-- resume section end -->
 </Layout>

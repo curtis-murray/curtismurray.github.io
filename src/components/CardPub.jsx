@@ -1,8 +1,6 @@
 import PropTypes from "prop-types";
 
 const CardPub = ({ details }) => {
-  // Assuming the `details.data` object contains all the necessary publication information
-  // and `details.data.doi` is the full URL to the publication
   return (
     <a
       href={details.data.doi}
@@ -10,12 +8,32 @@ const CardPub = ({ details }) => {
       target="_blank"
       rel="noopener noreferrer"
     >
-      <span className="text-tiny text-text-primary dark:text-dark-text">
-        {details.data.year}
-      </span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-tiny text-text-primary dark:text-dark-text">
+          {details.data.year}
+        </span>
+        {details.data.metric && (
+          <span className="text-tiny px-2 py-0.5 rounded-full bg-btn-primary text-white font-medium">
+            {details.data.metric}
+          </span>
+        )}
+      </div>
       <h3 className="text-xl dark:text-white">{details.data.title}</h3>
-      <p className="dark:text-dark-text">{details.data.authors.join(", ")}</p> {/* Assuming authors is an array */}
-      <p className="dark:text-dark-text">{details.data.journal}</p>
+      <p className="dark:text-dark-text">
+        {details.data.authors.map((author, i) => (
+          <span key={i}>
+            {i > 0 && ", "}
+            {author === "Curtis Murray" ? (
+              <span className="font-semibold text-btn-secondary">
+                {author}
+              </span>
+            ) : (
+              author
+            )}
+          </span>
+        ))}
+      </p>
+      <p className="dark:text-dark-text italic">{details.data.journal}</p>
       <span className="text-tiny text-text-secondary dark:text-dark-text">
         DOI: {details.data.doi}
       </span>
@@ -31,6 +49,7 @@ CardPub.propTypes = {
       title: PropTypes.string,
       authors: PropTypes.arrayOf(PropTypes.string),
       journal: PropTypes.string,
+      metric: PropTypes.string,
       doi: PropTypes.string,
     }),
   }),

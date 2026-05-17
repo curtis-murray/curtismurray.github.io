@@ -1,5 +1,5 @@
 ---
-title: "R"
-percentage: 90
+title: "Python"
+percentage: 95
 bgColor: "bg-progress-bg-one"
 ---

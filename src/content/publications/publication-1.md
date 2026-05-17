@@ -1,8 +1,9 @@
 ---
-title: "Symptom extraction from the narratives of personal experiences with COVID-19 on Reddit"
+title: "Probabilistic emotion and sentiment modelling of patient-reported experiences"
 authors: ["Curtis Murray", "Lewis Mitchell", "Jonathon Tuke", "Mark Mackay"]
-year: "2021"
-journal: "Workshop Proceedings of the 15th International AAAI Conference on Web and Social Media, Special Edition on Healthcare Social Analytics"
-doi: "https://doi.org/10.36190/2021.71"
+year: "2025"
+journal: "Artificial Intelligence in Medicine, 139, 103178"
+metric: "IF 6.2 · Q1"
+doi: "https://doi.org/10.1016/j.artmed.2025.103178"
 bgColor: "bg-edu-card-one"
 ---

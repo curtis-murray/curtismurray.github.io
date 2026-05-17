@@ -1,9 +1,12 @@
 ---
 skill:
-  - NLP
-  - Electronic Medical Records
-  - Patient-Reported Experience
-  - Networks
-  - Data Science
-  - Applied Mathmatics
+  - Agentic AI
+  - LLMs
+  - MCP
+  - RAG
+  - Knowledge Graphs
+  - Clinical NLP
+  - Bayesian Inference
+  - Network Science
+  - Applied Mathematics
 ---
