@@ -239,6 +239,20 @@ declare module 'astro:content' {
   collection: "experience";
   data: any
 } & { render(): Render[".md"] };
+"experience-5.md": {
+	id: "experience-5.md";
+  slug: "experience-5";
+  body: string;
+  collection: "experience";
+  data: any
+} & { render(): Render[".md"] };
+"experience-6.md": {
+	id: "experience-6.md";
+  slug: "experience-6";
+  body: string;
+  collection: "experience";
+  data: any
+} & { render(): Render[".md"] };
 };
 "knowledges": {
 "index.md": {
@@ -285,6 +299,13 @@ declare module 'astro:content' {
   collection: "menu";
   data: any
 } & { render(): Render[".md"] };
+"item-6.md": {
+	id: "item-6.md";
+  slug: "item-6";
+  body: string;
+  collection: "menu";
+  data: any
+} & { render(): Render[".md"] };
 };
 "personalInfo": {
 "index.md": {
@@ -315,22 +336,6 @@ declare module 'astro:content' {
   slug: "filter-3";
   body: string;
   collection: "portfolioFilters";
-  data: any
-} & { render(): Render[".md"] };
-};
-"preprints": {
-"pre1.md": {
-	id: "pre1.md";
-  slug: "pre1";
-  body: string;
-  collection: "preprints";
-  data: any
-} & { render(): Render[".md"] };
-"pre2.md": {
-	id: "pre2.md";
-  slug: "pre2";
-  body: string;
-  collection: "preprints";
   data: any
 } & { render(): Render[".md"] };
 };
@@ -372,6 +377,27 @@ declare module 'astro:content' {
   collection: "publications";
   data: any
 } & { render(): Render[".md"] };
+"publication-2.md": {
+	id: "publication-2.md";
+  slug: "publication-2";
+  body: string;
+  collection: "publications";
+  data: any
+} & { render(): Render[".md"] };
+"publication-3.md": {
+	id: "publication-3.md";
+  slug: "publication-3";
+  body: string;
+  collection: "publications";
+  data: any
+} & { render(): Render[".md"] };
+"publication-4.md": {
+	id: "publication-4.md";
+  slug: "publication-4";
+  body: string;
+  collection: "publications";
+  data: any
+} & { render(): Render[".md"] };
 };
 "skills": {
 "skill-1.md": {
@@ -402,13 +428,6 @@ declare module 'astro:content' {
   collection: "skills";
   data: any
 } & { render(): Render[".md"] };
-"skill-5.md": {
-	id: "skill-5.md";
-  slug: "skill-5";
-  body: string;
-  collection: "skills";
-  data: any
-} & { render(): Render[".md"] };
 };
 "works": {
 "portfolio-1.md": {
@@ -421,6 +440,13 @@ declare module 'astro:content' {
 "portfolio-2.md": {
 	id: "portfolio-2.md";
   slug: "portfolio-2";
+  body: string;
+  collection: "works";
+  data: any
+} & { render(): Render[".md"] };
+"portfolio-3.md": {
+	id: "portfolio-3.md";
+  slug: "portfolio-3";
   body: string;
   collection: "works";
   data: any
