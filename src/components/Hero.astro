@@ -1,0 +1,80 @@
+---
+// Opening hero: portrait + the locked opener copy + CTAs, full-viewport over
+// the mountain dawn/dusk, with flowing topographic lines drifting through.
+import TopoLines from "./TopoLines.astro";
+---
+
+<section class="relative min-h-[100svh] flex items-center overflow-hidden">
+  <TopoLines
+    count={11}
+    baseline={120}
+    spread={11}
+    class="pointer-events-none absolute inset-x-0 top-[14%] h-[42%] opacity-90"
+  />
+
+  <div
+    class="container mx-auto px-6 lg:px-16 grid lg:grid-cols-12 gap-10 lg:gap-12 items-center pt-28 pb-28 relative"
+  >
+    <div class="lg:col-span-7 io-reveal">
+      <p
+        class="text-sm font-medium tracking-[0.18em] uppercase text-primary mb-6"
+      >
+        Curtis Murray, PhD · AI Engineer · Melbourne
+      </p>
+      <h1
+        class="font-slab font-bold text-base-content text-[2.5rem] leading-[1.08] sm:text-6xl lg:text-[4.25rem] tracking-tight"
+      >
+        Don't you hate it when your LLM starts hallucinating?
+      </h1>
+      <p
+        class="mt-7 max-w-2xl text-lg sm:text-xl leading-relaxed text-base-content/80"
+      >
+        Me too. I did a PhD betting on transparent models you could trust over
+        black boxes you just hoped would work. Then the black boxes got too good
+        to ignore — so I kept the rigour and moved it into the system around
+        them.
+      </p>
+      <div class="mt-10 flex flex-wrap items-center gap-4">
+        <a
+          href="#thesis"
+          class="inline-flex items-center gap-2 rounded-full bg-primary px-7 py-3.5 text-base font-medium text-primary-content shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5 hover:shadow-xl"
+        >
+          Come see how
+          <span aria-hidden="true" class="text-lg">↓</span>
+        </a>
+        <a
+          href="/Curtis_Murray_Resume.pdf"
+          download
+          class="inline-flex items-center gap-2 rounded-full px-7 py-3.5 text-base font-medium text-base-content ring-1 ring-base-content/25 transition-all hover:ring-primary hover:text-primary"
+        >
+          Download résumé
+        </a>
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 io-reveal flex justify-center lg:justify-end">
+      <div class="relative">
+        <div
+          class="absolute -inset-3 rounded-[2rem] bg-primary/15 blur-2xl"
+          aria-hidden="true"
+        >
+        </div>
+        <img
+          src="/assets/about/avatar.png"
+          alt="Curtis Murray"
+          width="340"
+          height="420"
+          class="relative w-60 sm:w-72 lg:w-[20rem] aspect-[4/5] object-cover rounded-[1.75rem] shadow-2xl ring-1 ring-base-content/10"
+        />
+      </div>
+    </div>
+  </div>
+
+  <a
+    href="#thesis"
+    aria-label="Scroll to the story"
+    class="absolute bottom-8 left-1/2 -translate-x-1/2 text-base-content/50 hover:text-primary transition-colors animate-bounce"
+  >
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+  </a>
+</section>

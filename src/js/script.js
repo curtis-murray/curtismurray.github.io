@@ -1,44 +1,22 @@
+// Theme toggle via event delegation, wired once. Any element with
+// [data-theme-toggle] anywhere on the page flips the theme — so the mobile
+// Header button and the desktop StoryNav button both work without duplicate IDs.
+// Drives the DaisyUI [data-theme] token set + the legacy `dark` class together,
+// persisting to localStorage key "theme" ("light"/"dark"). The no-flash
+// bootstrap in Layout.astro sets the initial value before paint; icon
+// visibility is handled in pure CSS off [data-theme] (see global.css), so there
+// is nothing to sync here.
 export function themeToggler() {
-  // Get the theme toggle button and body element
-  const themeToggle = document.getElementById("theme-toggle");
-  const darkBtn = document.getElementById("theme-toggle-dark-icon");
-  const lightBtn = document.getElementById("theme-toggle-light-icon");
-  const lightLogo = document.querySelector(".lightLogo");
-  const darkLogo = document.querySelector(".darkLogo");
+  if (typeof window === "undefined" || window.__themeWired) return;
+  window.__themeWired = true;
 
-  // Check the current theme from local storage (or use a default)
-  const currentTheme = localStorage.getItem("theme") || "dark";
-  document.documentElement.classList.add(currentTheme);
-
-  if (currentTheme == "dark") {
-    darkBtn.classList.remove("hidden");
-    lightBtn.classList.add("hidden");
-    darkLogo.classList.remove("hidden");
-    lightLogo.classList.add("hidden");
-  } else {
-    lightBtn.classList.remove("hidden");
-    darkBtn.classList.add("hidden");
-    lightLogo.classList.remove("hidden");
-    darkLogo.classList.add("hidden");
-  }
-
-  // Listen for clicks on the theme toggle button
-  themeToggle.addEventListener("click", () => {
-    // Toggle between "light" and "dark" themes
-    if (document.documentElement.classList.contains("light")) {
-      document.documentElement.classList.replace("light", "dark");
-      darkBtn.classList.remove("hidden");
-      lightBtn.classList.add("hidden");
-      darkLogo.classList.remove("hidden");
-      lightLogo.classList.add("hidden");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.replace("dark", "light");
-      lightBtn.classList.remove("hidden");
-      darkBtn.classList.add("hidden");
-      lightLogo.classList.remove("hidden");
-      darkLogo.classList.add("hidden");
-      localStorage.setItem("theme", "light");
-    }
+  document.addEventListener("click", (e) => {
+    const btn = e.target.closest?.("[data-theme-toggle]");
+    if (!btn) return;
+    const root = document.documentElement;
+    const dark = !root.classList.contains("dark");
+    root.classList.toggle("dark", dark);
+    root.dataset.theme = dark ? "catppuccin" : "autumn-day";
+    localStorage.setItem("theme", dark ? "dark" : "light");
   });
 }

@@ -1,0 +1,24 @@
+---
+// Consistent interior-page header: burnt-orange eyebrow + slab-serif title,
+// matching the story's typography.
+interface Props {
+  eyebrow?: string;
+  title: string;
+}
+const { eyebrow, title } = Astro.props;
+---
+
+<header class="mb-10">
+  {
+    eyebrow && (
+      <p class="text-sm font-medium tracking-[0.16em] uppercase text-primary mb-2">
+        {eyebrow}
+      </p>
+    )
+  }
+  <h1
+    class="font-slab font-bold text-base-content text-4xl sm:text-5xl tracking-tight"
+  >
+    {title}
+  </h1>
+</header>

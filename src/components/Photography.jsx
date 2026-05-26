@@ -75,12 +75,15 @@ const Photography = ({ photos }) => {
   }, [activeIndex, closeLightbox, showPrev, showNext]);
 
   return (
-    <div className="container mr-auto ml-auto mb-8 px-4 sm:px-5 md:px-10 lg:px-[60px]">
-      <div className="py-12">
-        <h2 className="relative inline-block text-[2.5rem] dark:text-white font-bold transform after:absolute after:md:w-[12rem] after:left-[16rem] after:h-0.5 after:bg-gradient-to-r after:from-btn-secondary after:to-btn-secondary after:content-[''] after:rounded-md after:top-2/4 after:transform">
+    <div className="container mr-auto ml-auto mb-8 px-4 sm:px-6 lg:px-16 pt-6 lg:pt-10">
+      <header className="mb-10">
+        <p className="text-sm font-medium tracking-[0.16em] uppercase text-primary mb-2">
+          For fun · Australian wildlife
+        </p>
+        <h1 className="font-slab font-bold text-base-content text-4xl sm:text-5xl tracking-tight">
           Photography
-        </h2>
-      </div>
+        </h1>
+      </header>
 
       <div ref={gridRef} className="photography-grid -mx-1.5">
         <div className="grid-sizer w-full sm:w-1/2 lg:w-1/3"></div>
@@ -92,7 +95,7 @@ const Photography = ({ photos }) => {
             <button
               type="button"
               onClick={() => openLightbox(index)}
-              className="block w-full overflow-hidden rounded-lg group focus:outline-none focus:ring-2 focus:ring-btn-primary"
+              className="block w-full overflow-hidden rounded-lg group focus:outline-none focus:ring-2 focus:ring-primary"
               aria-label="Open photo"
             >
               <img

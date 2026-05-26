@@ -1,95 +1,50 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import PageHeader from "../components/PageHeader.astro";
+const fieldClass =
+  "block py-2.5 px-0 w-full text-base text-base-content bg-transparent border-0 border-b-2 border-base-300 appearance-none focus:outline-none focus:ring-0 focus:border-primary peer";
+const labelClass =
+  "peer-focus:font-medium absolute text-sm text-base-content/55 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-primary peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8";
 ---
 
 <Layout
   title="Contact — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
 >
-  <h2
-    class="relative inline-block text-[2.5rem] dark:text-white font-bold transform after:absolute after:md:w-[12rem] after:left-[16rem] after:h-0.5 after:bg-gradient-to-r after:from-btn-secondary after:to-btn-secondary after:content-[''] after:rounded-md after:transform after:top-[76px] mb-12 md:mb-[30px] pl-4 md:pl-[60px] pt-12"
-  >
-    Contact
-  </h2>
-  <div
-    class="mx-4 md:mx-[60px] p-4 md:p-16 dark:border-dark-border dark:border-2 bg-light-bg rounded-xl dark:bg-dark-primary mb-[30px] md:mb-[60px]"
-  >
-    <h3 class="text-[1.5625rem]">
-  
-      <span class="font-semibold dark:text-white"
-        >Get in touch with me.</span
-      >
-    </h3>
+  <PageHeader eyebrow="Say hello" title="Get in touch" />
+  <p class="-mt-4 mb-9 max-w-2xl text-lg leading-relaxed text-base-content/75">
+    Open to AI engineering roles and available immediately. Drop a line below, or
+    email <a class="text-primary hover:underline underline-offset-4" href="mailto:curtis@curtismurray.tech">curtis@curtismurray.tech</a>.
+  </p>
 
-    <form action="https://formspree.io/f/mayrqeqn" method="POST">
-      <div
-        class="returnmessage"
-        data-success="Your message has been received, We will contact you soon."
-      >
-      </div>
-      <div class="empty_notice">
-        <span class="dark:text-main-text">Please Fill Required Fields</span>
-      </div>
+  <form action="https://formspree.io/f/mayrqeqn" method="POST" class="max-w-2xl">
+    <div
+      class="returnmessage"
+      data-success="Your message has been received, We will contact you soon."
+    >
+    </div>
+    <div class="empty_notice">
+      <span class="text-base-content/70">Please fill required fields</span>
+    </div>
 
-      <!-- name input  -->
-      <div class="relative z-0 w-full mt-[40px] mb-8 group">
-        <input
-          type="text"
-          id="name"
-          name="name"
-          class="block autofill:bg-transparent py-2.5 px-0 w-full text-sm text-text-primary bg-transparent border-0 border-b-[2px] border-light-border appearance-none dark:text-white dark:border-dark-borde-secondary dark:focus:border-dark-focus-border focus:outline-none focus:ring-0 focus:border-dark-focus-border peer"
-          placeholder=" "
-          required=""
-        />
-        <label
-          for="name"
-          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-main-text duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-dark-focus-border peer-focus:dark:text-dark-focus-border peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8"
-        >
-          Name *
-        </label>
-      </div>
+    <div class="relative z-0 w-full mt-6 mb-8 group">
+      <input type="text" id="name" name="name" class={fieldClass} placeholder=" " required="" />
+      <label for="name" class={labelClass}>Name *</label>
+    </div>
 
-      <!-- email input  -->
-      <div class="relative z-0 w-full mb-8 group">
-        <input
-          type="email"
-          name="email"
-          class="block autofill:text-red-900 needed py-2.5 px-0 w-full text-sm text-text-primary bg-transparent border-0 border-b-[2px] border-light-border appearance-none dark:text-white dark:border-dark-borde-secondary dark:focus:border-dark-focus-border focus:outline-none focus:ring-0 focus:border-focus-border-one peer"
-          placeholder=" "
-          id="email"
-          required=""
-        />
-        <label
-          for="email"
-          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-main-text duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-focus-text-one peer-focus:dark:text-dark-focus-border peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8"
-        >
-          Email *
-        </label>
-      </div>
+    <div class="relative z-0 w-full mb-8 group">
+      <input type="email" name="email" id="email" class={fieldClass} placeholder=" " required="" />
+      <label for="email" class={labelClass}>Email *</label>
+    </div>
 
-      <!-- message input  -->
-      <div class="relative z-0 w-full mb-8 group">
-        <input
-          type="text"
-          name="message"
-          class="block py-2.5 px-0 w-full text-sm text-text-primary bg-transparent border-0 border-b-[2px] border-light-border appearance-none dark:text-white dark:border-dark-borde-secondary dark:focus:border-dark-focus-border focus:outline-none focus:ring-0 focus:border-focus-border-two peer"
-          placeholder=" "
-          id="message"
-          required=""
-        />
-        <label
-          for="message"
-          class="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-main-text duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-focus-border-two peer-focus:dark:text-dark-focus-border peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-8"
-        >
-          Message *
-        </label>
-      </div>
+    <div class="relative z-0 w-full mb-8 group">
+      <input type="text" name="message" id="message" class={fieldClass} placeholder=" " required="" />
+      <label for="message" class={labelClass}>Message *</label>
+    </div>
 
-      <!-- submit buttons -->
-      <input
-        type="submit"
-        class="px-6 py-2 rounded-lg border-[2px] mt-3 border-color-910 font-semibold cursor-pointer hover:bg-gradient-to-r from-btn-primary to-btn-secondary hover:text-white transition-colors duration-300 ease-in-out hover:border-transparent dark:text-white"
-        value="Submit"
-      />
-    </form>
-  </div>
+    <input
+      type="submit"
+      class="inline-flex cursor-pointer rounded-full bg-primary px-7 py-3 font-medium text-primary-content shadow-lg shadow-primary/20 transition-all hover:-translate-y-0.5"
+      value="Send message"
+    />
+  </form>
 </Layout>

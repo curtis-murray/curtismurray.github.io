@@ -1,17 +1,18 @@
 import PropTypes from "prop-types";
 
+// Education / experience entry.
 const Card = ({ details }) => {
   return (
-    <div
-      className={`${details.data.bgColor} dark:bg-transparent py-4 pl-5 pr-3 space-y-2 mb-6 rounded-lg dark:border-dark-border dark:border-2`}
-    >
-      <span className="text-tiny text-text-primary dark:text-dark-text">
+    <div className="bg-base-200/60 ring-1 ring-base-300/50 py-5 px-5 space-y-2 mb-5 rounded-xl">
+      <span className="text-xs font-medium tracking-wide uppercase text-primary">
         {details.data.year}
       </span>
-      <h3 className="text-xl dark:text-white">{details.data.title}</h3>
-      <p className="dark:text-dark-text">{details.data.subTitle}</p>
+      <h3 className="text-xl font-semibold text-base-content">
+        {details.data.title}
+      </h3>
+      <p className="text-base-content/75">{details.data.subTitle}</p>
       {details.data.description && (
-        <p className="text-sm text-text-primary dark:text-main-text leading-relaxed pt-1">
+        <p className="text-sm text-base-content/70 leading-relaxed pt-1">
           {details.data.description}
         </p>
       )}

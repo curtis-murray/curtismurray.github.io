@@ -1,73 +1,95 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
-import MainCarousel from "../components/MainCarousel";
-import { getCollection } from "astro:content";
-import SkillCard from "../components/SkillCard";
-import Sidebar from "../components/Sidebar";
-const personalInfo = await getCollection("personalInfo");
-const skills = await getCollection("skills");
+import Hero from "../components/Hero.astro";
+import StoryChapter from "../components/StoryChapter.astro";
+import WorkList from "../components/WorkList.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import GroundingLoop from "../components/GroundingLoop.jsx";
 ---
 
 <Layout
-  title="About — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
+  story
+  title="Curtis Murray · AI Engineer — grounding LLMs in something you can trust"
 >
-  <!-- about me section start -->
-  <div class="pt-12 md:py-12 px-2 sm:px-5 md:px-10 lg:px-14">
-    <!-- about page title -->
-    <h2
-      class="relative inline-block text-[2.5rem] dark:text-white font-bold transform after:absolute after:md:w-[12rem] after:left-[14rem] after:h-0.5 after:bg-gradient-to-r after:from-btn-secondary after:to-btn-secondary after:content-[''] after:rounded-md after:top-2/4 after:transform"
-    >
-      About Me
-    </h2>
-    <p class="mt-3 text-sm font-medium text-btn-primary">
-      Open to AI engineering roles · available immediately
-    </p>
-    <!-- personal info for mobile devices start -->
-    <div class="lg:hidden">
-      <Sidebar personalInfo={personalInfo} />
-    </div>
-    <!-- personal info for mobile devices end -->
+  <Hero />
 
-    <div
-      class="lg:grid grid-cols-12 md:gap-10 pt-4 md:pt-[30px] items-center hidden"
-    >
-      <div class="col-span-12 space-y-2.5">
-        <div class="lg:mr-16">
-          <p
-            class="text-text-primary dark:text-main-text leading-7"
-            set:html={personalInfo[0].body}
-          />
-        </div>
-        <div></div>
+  <StoryChapter
+    id="thesis"
+    num="01"
+    eyebrow="The fix"
+    title="Your LLM is confidently wrong, and you can't see where."
+  >
+    <p>
+      Constrain it to reason over real, verified entities and it can't invent
+      what isn't there. Evaluate every tool call and the reasoning has nowhere
+      to hide.
+    </p>
+    <p>
+      This is how I built the first working morphological analyser for spoken
+      Tamil — literary Tamil has had analysers for years; spoken Tamil had none.
+    </p>
+  </StoryChapter>
+
+  <!-- Interactive centerpiece: the propose → ground → dispose loop -->
+  <section id="grounding" class="relative py-12 sm:py-20">
+    <div class="container mx-auto px-6 lg:px-16">
+      <div class="io-reveal mx-auto max-w-4xl">
+        <p
+          class="text-sm font-medium tracking-[0.16em] uppercase text-primary mb-2 text-center"
+        >
+          The pattern, made tangible
+        </p>
+        <h2
+          class="font-slab font-bold text-base-content text-3xl sm:text-[2.5rem] tracking-tight text-center mb-8"
+        >
+          Watch it refuse to make things up.
+        </h2>
+        <GroundingLoop client:visible />
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- what i do section start -->
-  <div class="pb-12 px-2 sm:px-5 md:px-10 lg:px-14">
-    <h3 class="text-[35px] dark:text-white font-bold font-robotoSlab pb-5">
-    Focus Areas:
-    </h3>
-    <div class="grid gap-8 grid-cols-1 md:grid-cols-2 xl:grid-cols-2">
-      {
-        skills.map((item) => {
-          return <SkillCard skill={item} />;
-        })
-      }
-    </div>
-  </div>
+  <StoryChapter
+    num="02"
+    eyebrow="The throughline"
+    title="I've been doing one thing my whole career."
+  >
+    <p>
+      The tools keep changing. The job doesn't: <strong
+        class="text-base-content">messy, unstructured data in — trustworthy
+        structure out.</strong
+      > My PhD was applied maths and NLP, pulling the hidden structure out of online
+      health narratives with methods you could inspect and explain, not black boxes.
+      The result I'm proudest of: we picked up COVID anosmia signals in Reddit data
+      before they were widely recognised clinically.
+    </p>
+    <p>
+      I took the same instinct into a clinical project at RMIT — mapping messy
+      free-text notes onto verified medical entities — and beat string matching,
+      ClinicalBERT, and raw LLM generation by grounding every answer in a
+      trusted source instead of letting the model freelance.
+    </p>
+  </StoryChapter>
 
-  <!-- projects CTA -->
-  <div class="pb-12 px-2 sm:px-5 md:px-10 lg:px-14">
-    <a
-      href="/projects/"
-      class="inline-flex items-center gap-2 text-lg font-medium text-btn-primary hover:text-btn-secondary transition-colors"
-    >
-      See what I'm building →
-    </a>
-  </div>
+  <WorkList />
 
-  <!-- about me section End -->
+  <StoryChapter
+    num="03"
+    eyebrow="In production"
+    title="And it has to actually work."
+  >
+    <p>
+      I'm not only a researcher. I shipped an optimisation model at an energy
+      company that closed a $600k licence sale, and I build full-stack — so I
+      care about the thing running in production, not just in a notebook.
+    </p>
+    <p>
+      Now that LLMs are this capable I lean on them heavily, and I make up for
+      their opacity by moving the rigour into the system around them:
+      traceability, tool-call evaluation, and a deterministic core the model
+      can't override.
+    </p>
+  </StoryChapter>
+
+  <SiteFooter />
 </Layout>

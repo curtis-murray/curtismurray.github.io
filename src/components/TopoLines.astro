@@ -1,0 +1,41 @@
+---
+// Thin flowing topographic line-work, à la the Aaron Walter reference. A set of
+// nearly-parallel contour strokes that drift across the band. Reusable over the
+// hero and as a section divider. Colour + opacity come from theme tokens.
+import { linePath } from "../utils/ridge.js";
+
+interface Props {
+  count?: number;
+  class?: string;
+  baseline?: number; // mean y in the 1440×240 viewBox
+  spread?: number; // vertical px between lines
+}
+const {
+  count = 9,
+  class: className = "",
+  baseline = 120,
+  spread = 13,
+} = Astro.props;
+
+const W = 1440;
+const VH = 240;
+const lines = Array.from({ length: count }, (_, i) => {
+  const offset = (i - (count - 1) / 2) * spread;
+  return linePath({
+    baseline: baseline + offset,
+    amp: 26 + i * 1.6,
+    seed: 200 + i * 13,
+    width: W,
+    samples: 40,
+  });
+});
+---
+
+<svg
+  class={`topo-lines ${className}`}
+  viewBox={`0 0 ${W} ${VH}`}
+  preserveAspectRatio="none"
+  aria-hidden="true"
+>
+  {lines.map((d) => <path d={d} fill="none" vector-effect="non-scaling-stroke" />)}
+</svg>

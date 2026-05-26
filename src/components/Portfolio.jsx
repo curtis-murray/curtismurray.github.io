@@ -37,26 +37,23 @@ const PortfolioContent = ({ portfolio, filters }) => {
     setActiveFilter(filterValue);
   };
   return (
-    <div className="container mr-auto ml-auto mb-8 px-4 sm:px-5 md:px-10 lg:px-[60px]">
-      <div className="py-12">
-        <h2 className="relative inline-block text-[2.5rem] dark:text-white font-bold transform after:absolute after:md:w-[12rem] after:left-[14rem] after:h-0.5 after:bg-gradient-to-r after:from-btn-secondary after:to-btn-secondary after:content-[''] after:rounded-md after:top-2/4 after:transform">
-          Portfolio
-        </h2>
-        <ul className="button-group isotop-menu-wrapper mt-[30px] flex w-full justify-start md:justify-end flex-wrap font-medium">
-          {filters.map((filter, index) => (
-            <li
-              key={index}
-              className={`cursor-pointer text-text-primary transition-all duration-300 ease-in-out hover:text-btn-primary dark:text-main-text fillter-btn mr-4 md:mx-4 ${
-                filter.data.tag == activeFilter ? "!text-btn-primary" : ""
-              }`}
-              data-filter={filter.data.tag}
-              onClick={() => handleFilter(filter.data.tag)}
-            >
-              {filter.data.name}
-            </li>
-          ))}
-        </ul>
-      </div>
+    <div className="mb-4">
+      <ul className="button-group isotop-menu-wrapper mb-8 flex w-full justify-start flex-wrap font-medium gap-x-6 gap-y-2">
+        {filters.map((filter, index) => (
+          <li
+            key={index}
+            className={`cursor-pointer transition-colors duration-300 ease-in-out hover:text-primary fillter-btn ${
+              filter.data.tag == activeFilter
+                ? "text-primary"
+                : "text-base-content/70"
+            }`}
+            data-filter={filter.data.tag}
+            onClick={() => handleFilter(filter.data.tag)}
+          >
+            {filter.data.name}
+          </li>
+        ))}
+      </ul>
 
       <div id="isotop-gallery-wrapper" className="portfolio_list-two two-col">
         <div className="grid-sizer w-[50%] px-[10px] py-[10px]"></div>

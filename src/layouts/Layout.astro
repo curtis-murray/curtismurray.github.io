@@ -1,16 +1,17 @@
 ---
 import "../styles/global.css";
 import Header from "../components/Header";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import StoryNav from "../components/StoryNav";
+import SiteFooter from "../components/SiteFooter.astro";
+import MountainScene from "../components/MountainScene.astro";
 import { getCollection } from "astro:content";
-const personalInfo = await getCollection("personalInfo");
 const menuItems = await getCollection("menu");
 const pathname = new URL(Astro.request.url).pathname;
 import { SEO } from "astro-seo";
 import config from "../config/config.json";
-const { title, description } = Astro.props;
+// `story` pages (the home) render full-bleed over the mountains; every other
+// route renders inside a centred, translucent base-100 panel.
+const { title, description, story = false } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -74,43 +75,72 @@ const { title, description } = Astro.props;
     <!-- commom meta tag -->
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <script defer>
-      if (
-        localStorage.theme === "dark" ||
-        (!("theme" in localStorage) &&
-          window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+    <script is:inline>
+      // No-flash theme bootstrap. Runs before paint: sets BOTH the DaisyUI
+      // [data-theme] token set and the legacy `dark` class (kept so any
+      // not-yet-migrated `dark:`-class components still resolve). localStorage
+      // key "theme" with values "light"/"dark" is preserved.
+      (function () {
+        var q = new URLSearchParams(location.search).get("theme");
+        if (q === "light" || q === "dark") localStorage.theme = q;
+        var dark =
+          localStorage.theme === "dark" ||
+          (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        var root = document.documentElement;
+        root.dataset.theme = dark ? "catppuccin" : "autumn-day";
+        root.classList.toggle("dark", dark);
+        // Enable scroll-reveal hiding only now that JS is confirmed running.
+        root.classList.add("reveal-on");
+      })();
     </script>
   </head>
-  <body>
-    <div
-      class="bg-home-bg dark:bg-home-bg-dark min-h-screen bg-no-repeat bg-center bg-cover bg-fixed md:pb-16 w-full"
-    >
+  <body class="text-base-content">
+    <MountainScene />
+    <div class="relative min-h-screen w-full">
       <Header client:load activeMenuId={pathname} menuItems={menuItems} />
-      <div
-        class="container mr-auto ml-auto grid grid-cols-12 md:gap-10 justify-between lg:mt-[220px]"
-      >
-        <!-- sidber personal info -->
-        <div
-          class="col-span-12 lg:col-span-4 hidden lg:block h-screen sticky top-44"
-        >
-          <Sidebar personalInfo={personalInfo} />
-        </div>
-        <div class="col-span-12 lg:col-span-8">
-          <!-- header for mobile devices start -->
-          <Navbar activeMenuId={pathname} menuItems={menuItems} />
-          <!-- header for mobile devices end -->
-          <div class="bg-white lg:rounded-2xl dark:bg-dark-primary">
+      <StoryNav client:load activeMenuId={pathname} menuItems={menuItems} />
+      {
+        story ? (
+          <main class="[view-transition-name:vt-content]">
             <slot />
-            <Footer />
-          </div>
-        </div>
-      </div>
+          </main>
+        ) : (
+          <main class="[view-transition-name:vt-content]">
+            <div class="container mr-auto ml-auto px-4 sm:px-6 lg:px-10 pt-6 lg:pt-10 pb-20">
+              <div class="rounded-2xl bg-base-100/80 backdrop-blur-md shadow-xl ring-1 ring-base-300/40 p-6 sm:p-10 lg:p-12 reveal reveal-1">
+                <slot />
+              </div>
+            </div>
+            <SiteFooter />
+          </main>
+        )
+      }
     </div>
-    <!-- End bgHomeBg -->
+    <script>
+      // Reveal story chapters as they scroll into view (.io-reveal → .is-visible).
+      const els = document.querySelectorAll(".io-reveal");
+      const reduce = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      if (els.length) {
+        if (reduce || !("IntersectionObserver" in window)) {
+          els.forEach((el) => el.classList.add("is-visible"));
+        } else {
+          const io = new IntersectionObserver(
+            (entries) => {
+              entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("is-visible");
+                  io.unobserve(entry.target);
+                }
+              });
+            },
+            { rootMargin: "0px 0px -12% 0px", threshold: 0.12 }
+          );
+          els.forEach((el) => io.observe(el));
+        }
+      }
+    </script>
   </body>
 </html>

@@ -13,7 +13,7 @@ const PortfolioCard = ({ details }) => {
   };
   return (
     <>
-      <div className="rounded-lg bg-light-bg-three p-6 dark:bg-transparent dark:border-[2px] border-dark-border">
+      <div className="rounded-xl bg-base-200/60 ring-1 ring-base-300/50 p-6">
         <div className="overflow-hidden rounded-lg">
           <a href={details.data.link}>
             <img
@@ -24,12 +24,12 @@ const PortfolioCard = ({ details }) => {
             />
           </a>
         </div>
-        <span className="pt-5 text-[14px] font-normal text-text-primary block dark:text-main-text">
+        <span className="pt-5 text-sm font-normal text-base-content/65 block">
           {details.data.category}
         </span>
 
         <h2
-          className="font-medium cursor-pointer text-xl duration-300 transition hover:text-btn-primary dark:hover:text-btn-primary dark:text-white mt-2"
+          className="font-medium cursor-pointer text-xl duration-300 transition hover:text-primary text-base-content mt-2"
           onClick={openModal}
         >
           <a href={details.data.link}>{details.data.title}</a>
@@ -38,37 +38,35 @@ const PortfolioCard = ({ details }) => {
 
       {showModal && (
         <Modal closeModal={closeModal}>
-          <h2 className="text-modal-text dark:hover:text-btn-primary text-4xl text-center font-bold">
+          <h2 className="text-primary text-3xl sm:text-4xl text-center font-slab font-bold">
             {details.data.modal.title}
           </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 my-6 pr-3">
+          <div className="grid grid-cols-1 lg:grid-cols-2 my-6 gap-2">
             <div className="space-y-2">
-              <p className="dark:text-white flex items-center text-[15px] sm:text-lg">
-                <i className="fa-regular fa-file-lines sm:text-lg hidden sm:block mr-4 md:text-xl" />
+              <p className="flex items-center text-[15px] sm:text-lg text-base-content/85">
                 Project :&nbsp;
-                <span className="font-medium">
+                <span className="font-medium text-base-content">
                   {details.data.modal.project}
                 </span>
               </p>
-              <p className="dark:text-white flex items-center text-[15px] sm:text-lg">
-                <i className="fa-solid fa-code text-lg mr-2 hidden sm:block" />
-                Langages :&nbsp;
-                <span className="font-medium">
+              <p className="flex items-center text-[15px] sm:text-lg text-base-content/85">
+                Languages :&nbsp;
+                <span className="font-medium text-base-content">
                   {details.data.modal.languages}
                 </span>
               </p>
             </div>
 
             <div className="space-y-2">
-              <p className="dark:text-white flex items-center mt-2 lg:mt-0 text-[15px] sm:text-lg">
-                <i className="fa-regular fa-user text-lg mr-2 hidden sm:block" />
+              <p className="flex items-center mt-2 lg:mt-0 text-[15px] sm:text-lg text-base-content/85">
                 Client :&nbsp;{" "}
-                <span className="font-medium">{details.data.modal.client}</span>
+                <span className="font-medium text-base-content">
+                  {details.data.modal.client}
+                </span>
               </p>
-              <p className="dark:text-white flex items-center text-[15px] sm:text-lg">
-                <i className="fa-solid fa-arrow-up-right-from-square text-lg mr-2 hidden sm:block" />
+              <p className="flex items-center text-[15px] sm:text-lg text-base-content/85">
                 Preview :&nbsp;
-                <span className="font-medium transition-all duration-300 ease-in-out hover:text-modal-text">
+                <span className="font-medium text-primary hover:underline underline-offset-4">
                   <a
                     href={details.data.modal.link}
                     target="_blank"
@@ -81,7 +79,7 @@ const PortfolioCard = ({ details }) => {
             </div>
           </div>
 
-          <p className="dark:text-white text-2line font-normal text-[15px] sm:text-sm">
+          <p className="text-base-content/80 font-normal text-[15px] sm:text-base leading-relaxed">
             {details.data.modal.description}
           </p>
           <div className="pr-3">

@@ -2,9 +2,9 @@ import PropTypes from "prop-types";
 
 const Tag = ({ tagName }) => {
   return (
-    <button className="resume-btn cursor-default rounded-lg bg-light-bg-six pl-5 pr-5 pt-2 pb-2 text-text-primary dark:bg-dark-bg-two dark:text-main-text">
+    <span className="cursor-default rounded-lg bg-base-200/70 ring-1 ring-base-300/50 px-4 py-2 text-sm text-base-content/85">
       {tagName}
-    </button>
+    </span>
   );
 };
 

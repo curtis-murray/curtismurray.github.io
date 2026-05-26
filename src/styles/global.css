@@ -2,6 +2,159 @@ html {
   font-family: "Poppins", sans-serif;
 }
 
+/* Theme-toggle icon visibility, driven purely off [data-theme] on <html> so any
+   number of toggle buttons stay correct with no JS and no flash.
+   light now → offer the moon (to-dark); dark now → offer the sun (to-light). */
+[data-theme="autumn-day"] .icon-to-light {
+  display: none;
+}
+[data-theme="catppuccin"] .icon-to-dark {
+  display: none;
+}
+
+/* Staggered entrance for the page's main zones on first load */
+@keyframes zoneIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal {
+  opacity: 0;
+  animation: zoneIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: opacity, transform;
+}
+.reveal-1 {
+  animation-delay: 0.05s;
+}
+.reveal-2 {
+  animation-delay: 0.2s;
+}
+.reveal-3 {
+  animation-delay: 0.35s;
+}
+.reveal-4 {
+  animation-delay: 0.5s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Mountain backdrop (MountainScene.astro) + topographic overlay (TopoLines.astro)
+
+   The fixed scene sits behind everything (z-index -1); the body stays
+   transparent so the mountains show through. All colour comes from the per-theme
+   ramps below, so dawn ↔ dusk switches purely on [data-theme].
+--------------------------------------------------------------------------- */
+
+/* Light = "autumn day": warm taupe ranges fading up to a cream dawn sky. */
+[data-theme="autumn-day"] {
+  --mtn-sky-top: #fae0ca;
+  --mtn-sky-bottom: #f6ddc4;
+  --mtn-glow: #e7a45c;
+  --mtn-1: #ecdcc8;
+  --mtn-2: #dcc7ad;
+  --mtn-3: #c9b094;
+  --mtn-4: #ab947b;
+  --mtn-5: #897a66;
+  --mtn-6: #635a4d;
+  --mtn-7: #3c372f;
+  --topo-stroke: rgba(120, 84, 42, 0.16);
+}
+
+/* Dark = "Catppuccin Mocha": distant ranges catch a mauve dusk glow, darkening
+   to crust at the foreground. */
+[data-theme="catppuccin"] {
+  --mtn-sky-top: #1e1e2e;
+  --mtn-sky-bottom: #181825;
+  --mtn-glow: #6c5b9a;
+  --mtn-1: #45475a;
+  --mtn-2: #393a4f;
+  --mtn-3: #2e2f42;
+  --mtn-4: #262636;
+  --mtn-5: #1d1d2b;
+  --mtn-6: #15151f;
+  --mtn-7: #0d0d14;
+  --topo-stroke: rgba(203, 166, 247, 0.12);
+}
+
+#mtn-scene {
+  position: fixed;
+  inset: -6% 0 0 0;
+  height: 112%;
+  z-index: -1;
+  pointer-events: none;
+  transform: translate3d(var(--px, 0px), 0, 0);
+  will-change: transform;
+}
+#mtn-scene svg {
+  display: block;
+}
+.mtn-layer {
+  /* depth-weighted scroll parallax: --d is 1 (back) … 7 (front); back moves
+     least. --scroll is window.scrollY (unitless) set by the scene script. */
+  transform: translate3d(
+    0,
+    calc(var(--scroll, 0) * var(--d, 0) * -0.04px),
+    0
+  );
+  will-change: transform;
+}
+
+.topo-lines {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.topo-lines path {
+  stroke: var(--topo-stroke);
+  stroke-width: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mtn-scene {
+    transform: none;
+  }
+  .mtn-layer {
+    transform: none;
+  }
+}
+
+/* Scroll-triggered reveal for story chapters (toggled by an IntersectionObserver
+   in Layout.astro). Distinct from .reveal, which fires once on load. */
+/* Progressive enhancement: only hide when JS has flagged the page ready
+   (html.reveal-on). With JS off or IntersectionObserver unsupported, content
+   stays visible — never trapped at opacity:0. */
+html.reveal-on .io-reveal:not(.is-visible) {
+  opacity: 0;
+  transform: translateY(26px);
+}
+.io-reveal {
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.reveal-on .io-reveal:not(.is-visible) {
+    opacity: 1;
+    transform: none;
+  }
+  .io-reveal {
+    transition: none;
+  }
+}
+
 /* width */
 .scrollbarLight::-webkit-scrollbar,
 .scrollbarDark::-webkit-scrollbar {
@@ -40,4 +193,35 @@ input:-webkit-autofill:focus {
   /* -webkit-box-shadow: 0 0 0px 1000px transparent inset; */
   transition: background-color 5000s ease-in-out 0s;
   background: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Cross-page layout morph (MPA View Transitions)
+
+   Browsers that support cross-document view transitions (Chromium 126+,
+   Safari 18+) animate the named layout pieces below between the About
+   "sidebar" layout and the wide layout. Unsupported browsers simply navigate
+   instantly — no animation, no breakage.
+--------------------------------------------------------------------------- */
+@view-transition {
+  navigation: auto;
+}
+
+/* Everything morphs together over the same window (no stagger). The navbar is
+   identical on every route, so it doesn't actually move — only the profile
+   (card/photo/name; contact fades out) and the content (grows wider) change. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 0.7s;
+  animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* Respect reduced-motion: skip the morph entirely. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
 }

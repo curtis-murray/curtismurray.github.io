@@ -1,0 +1,56 @@
+---
+// Closing band — the dark "base of the mountain". Uses neutral/neutral-content
+// so it reads as an earthy footer in autumn-day and a deep one in catppuccin.
+const email = "curtis@curtismurray.tech";
+const linkedIn = "https://www.linkedin.com/in/curtiswmurray/";
+const scholar =
+  "https://scholar.google.com.au/citations?user=25fFcUUAAAAJ&hl=en&oi=ao";
+---
+
+<footer
+  class="relative mt-16 bg-neutral text-neutral-content rounded-t-[2.5rem] overflow-hidden"
+>
+  <div class="container mx-auto px-6 lg:px-16 py-16 sm:py-24">
+    <div class="io-reveal max-w-3xl">
+      <p class="text-sm font-medium tracking-[0.16em] uppercase opacity-70 mb-4">
+        Looking to join a team solving real problems
+      </p>
+      <h2 class="font-slab font-bold text-4xl sm:text-5xl tracking-tight">
+        Let's build something you can trust.
+      </h2>
+      <a
+        href={`mailto:${email}`}
+        class="group inline-flex items-center gap-3 mt-8 text-xl sm:text-2xl font-medium underline-offset-8 hover:underline"
+      >
+        {email}
+        <span
+          aria-hidden="true"
+          class="transition-transform group-hover:translate-x-1">→</span
+        >
+      </a>
+    </div>
+
+    <div
+      class="mt-14 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium"
+    >
+      <a
+        href="/Curtis_Murray_Resume.pdf"
+        download
+        class="rounded-full bg-neutral-content/15 px-5 py-2.5 hover:bg-neutral-content/25 transition-colors"
+      >
+        Download résumé
+      </a>
+      <a href={linkedIn} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">LinkedIn</a>
+      <a href={scholar} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">Google Scholar</a>
+      <a href="/projects/" class="opacity-80 hover:opacity-100 transition-opacity">Projects</a>
+      <a href="/photography/" class="opacity-80 hover:opacity-100 transition-opacity">Photography</a>
+    </div>
+
+    <div
+      class="mt-14 pt-6 border-t border-neutral-content/15 flex flex-wrap justify-between gap-4 text-xs opacity-60"
+    >
+      <span>Curtis Murray, PhD · Melbourne, Australia</span>
+      <span>© {new Date().getFullYear()} · Built with Astro</span>
+    </div>
+  </div>
+</footer>
