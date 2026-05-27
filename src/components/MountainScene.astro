@@ -19,7 +19,7 @@ const layers = [
   { baseline: 458, amp: 56, seed: 89 },
   { baseline: 500, amp: 60, seed: 103 },
 ].map((l, i) => ({
-  d: ridgePath(l, { width: W, floor: H }),
+  d: ridgePath({ ...l, width: W, bleed: 70 }, { floor: H }),
   idx: i + 1,
 }));
 ---
@@ -48,21 +48,25 @@ const layers = [
 
     {
       layers.map((l) => (
-        <path
-          class="mtn-layer"
-          d={l.d}
-          fill={`var(--mtn-${l.idx})`}
-          style={`--d:${l.idx}`}
-        />
+        <g class="mtn-layer" style={`--d:${l.idx}`}>
+          <path
+            class="mtn-wave"
+            d={l.d}
+            fill={`var(--mtn-${l.idx})`}
+            style={`--wx:${(l.idx % 2 ? 1 : -1) * (5 + l.idx * 2)}px; --wy:${-(2 + l.idx * 0.7).toFixed(1)}px; --wdur:${(30 - l.idx * 1.4).toFixed(1)}s; --wdelay:${(-l.idx * 2.6).toFixed(1)}s`}
+          />
+        </g>
       ))
     }
   </svg>
 </div>
+<div id="mtn-dusk" aria-hidden="true"></div>
 
 <script>
   // Scroll parallax (per-layer, depth-weighted) + slow eased mouse drift.
   // Both gated on prefers-reduced-motion.
   const scene = document.getElementById("mtn-scene");
+  const dusk = document.getElementById("mtn-dusk");
   const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (scene && !reduce) {
     let tx = 0,
@@ -74,6 +78,11 @@ const layers = [
       ticking = true;
       requestAnimationFrame(() => {
         scene.style.setProperty("--scroll", String(window.scrollY));
+        if (dusk) {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          const progress = max > 0 ? window.scrollY / max : 0;
+          dusk.style.opacity = String(Math.min(progress * 1.05, 1) * 0.6);
+        }
         ticking = false;
       });
     };

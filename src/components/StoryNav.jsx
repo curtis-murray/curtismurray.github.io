@@ -25,7 +25,7 @@ const StoryNav = ({ activeMenuId, menuItems, name = "Curtis Murray" }) => {
             <li key={index}>
               <a
                 href={item.data.link}
-                className={`text-sm font-medium transition-colors ${
+                className={`text-sm font-medium lowercase transition-colors ${
                   activeMenuId == item.data.link
                     ? "text-primary"
                     : "text-base-content/70 hover:text-primary"

@@ -21,7 +21,7 @@ function rng(seed) {
  * @param {number} [o.width]   svg user-space width
  * @param {number} [o.samples] point count
  */
-export function ridge({ baseline, amp, seed, width = 1440, samples = 36 }) {
+export function ridge({ baseline, amp, seed, width = 1440, samples = 36, bleed = 0 }) {
   const rnd = rng(seed);
   // freq multiplier, relative amplitude
   const octaves = [
@@ -31,6 +31,7 @@ export function ridge({ baseline, amp, seed, width = 1440, samples = 36 }) {
     [6.3, 0.13],
   ];
   const phases = octaves.map(() => rnd() * TAU);
+  const span = width + bleed * 2;
   const pts = [];
   for (let i = 0; i <= samples; i++) {
     const t = i / samples;
@@ -38,7 +39,8 @@ export function ridge({ baseline, amp, seed, width = 1440, samples = 36 }) {
     octaves.forEach(([f, a], k) => {
       y -= amp * a * Math.sin(t * TAU * f + phases[k]);
     });
-    pts.push([t * width, y]);
+    // sample from -bleed to width+bleed so a drifting ridge never exposes an edge
+    pts.push([-bleed + t * span, y]);
   }
   return pts;
 }
@@ -62,9 +64,13 @@ function curve(pts) {
   return d;
 }
 
-/** Closed silhouette path (ridge + down to baseline floor). */
-export function ridgePath(opts, { width = 1440, floor = 600 } = {}) {
-  return `${curve(ridge(opts))} L${width},${floor} L0,${floor} Z`;
+/** Closed silhouette path (ridge + down to baseline floor), closing at the
+ *  ridge's actual horizontal extents (which include any bleed). */
+export function ridgePath(opts, { floor = 600 } = {}) {
+  const pts = ridge(opts);
+  const x0 = pts[0][0];
+  const x1 = pts[pts.length - 1][0];
+  return `${curve(pts)} L${x1.toFixed(1)},${floor} L${x0.toFixed(1)},${floor} Z`;
 }
 
 /** Open stroke path (for topographic overlay lines). */

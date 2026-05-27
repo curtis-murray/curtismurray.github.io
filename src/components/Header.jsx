@@ -60,7 +60,7 @@ const Header = ({ activeMenuId, menuItems }) => {
             return (
               <li key={index}>
                 <a
-                  className={`flex cursor-pointer items-center py-3 px-5 font-medium text-sm transition-all duration-300 ease-in-out ${
+                  className={`flex cursor-pointer items-center py-3 px-5 font-medium text-sm lowercase transition-all duration-300 ease-in-out ${
                     activeMenuId == item.data.link
                       ? "text-primary"
                       : "text-base-content hover:text-primary"

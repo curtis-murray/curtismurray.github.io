@@ -77,12 +77,16 @@ const Photography = ({ photos }) => {
   return (
     <div className="container mr-auto ml-auto mb-8 px-4 sm:px-6 lg:px-16 pt-6 lg:pt-10">
       <header className="mb-10">
-        <p className="text-sm font-medium tracking-[0.16em] uppercase text-primary mb-2">
-          For fun · Australian wildlife
+        <p className="text-sm font-medium tracking-[0.16em] text-primary mb-2">
+          for fun · australian wildlife
         </p>
         <h1 className="font-slab font-bold text-base-content text-4xl sm:text-5xl tracking-tight">
-          Photography
+          photography
         </h1>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-base-content/75">
+          sometimes it's nice to get away from ai. here are some birds and
+          things i have found pretty.
+        </p>
       </header>
 
       <div ref={gridRef} className="photography-grid -mx-1.5">

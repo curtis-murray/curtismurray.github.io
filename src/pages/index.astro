@@ -5,6 +5,7 @@ import StoryChapter from "../components/StoryChapter.astro";
 import WorkList from "../components/WorkList.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import GroundingLoop from "../components/GroundingLoop.jsx";
+import TypeOnView from "../components/TypeOnView.jsx";
 ---
 
 <Layout
@@ -16,8 +17,8 @@ import GroundingLoop from "../components/GroundingLoop.jsx";
   <StoryChapter
     id="thesis"
     num="01"
-    eyebrow="The fix"
-    title="Your LLM is confidently wrong, and you can't see where."
+    eyebrow="the fix"
+    title="your LLM is confidently wrong, and you can't see where."
   >
     <p>
       Constrain it to reason over real, verified entities and it can't invent
@@ -35,14 +36,14 @@ import GroundingLoop from "../components/GroundingLoop.jsx";
     <div class="container mx-auto px-6 lg:px-16">
       <div class="io-reveal mx-auto max-w-4xl">
         <p
-          class="text-sm font-medium tracking-[0.16em] uppercase text-primary mb-2 text-center"
+          class="text-sm font-medium tracking-[0.16em] text-primary mb-2 text-center"
         >
-          The pattern, made tangible
+          the pattern, made tangible
         </p>
         <h2
           class="font-slab font-bold text-base-content text-3xl sm:text-[2.5rem] tracking-tight text-center mb-8"
         >
-          Watch it refuse to make things up.
+          <TypeOnView client:visible text="watch it refuse to make things up. grounding. neurosymbolically." />
         </h2>
         <GroundingLoop client:visible />
       </div>
@@ -51,8 +52,8 @@ import GroundingLoop from "../components/GroundingLoop.jsx";
 
   <StoryChapter
     num="02"
-    eyebrow="The throughline"
-    title="I've been doing one thing my whole career."
+    eyebrow="the throughline"
+    title="i've been doing one thing my whole career."
   >
     <p>
       The tools keep changing. The job doesn't: <strong
@@ -72,24 +73,6 @@ import GroundingLoop from "../components/GroundingLoop.jsx";
   </StoryChapter>
 
   <WorkList />
-
-  <StoryChapter
-    num="03"
-    eyebrow="In production"
-    title="And it has to actually work."
-  >
-    <p>
-      I'm not only a researcher. I shipped an optimisation model at an energy
-      company that closed a $600k licence sale, and I build full-stack — so I
-      care about the thing running in production, not just in a notebook.
-    </p>
-    <p>
-      Now that LLMs are this capable I lean on them heavily, and I make up for
-      their opacity by moving the rigour into the system around them:
-      traceability, tool-call evaluation, and a deterministic core the model
-      can't override.
-    </p>
-  </StoryChapter>
 
   <SiteFooter />
 </Layout>

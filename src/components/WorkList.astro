@@ -2,6 +2,7 @@
 // Aaron-Walter-style chapter list: big titles on the left, role + dates on the
 // right, an arrow, and thin topographic lines streaming through the rows.
 import TopoLines from "./TopoLines.astro";
+import TypeOnView from "./TypeOnView.jsx";
 
 const items = [
   {
@@ -34,7 +35,7 @@ const items = [
 <section id="work" class="relative py-16 sm:py-24">
   <div class="container mx-auto px-6 lg:px-16">
     <div
-      class="io-reveal relative overflow-hidden rounded-3xl bg-base-100/65 backdrop-blur-md ring-1 ring-base-300/40 shadow-xl px-6 py-10 sm:px-12 sm:py-14"
+      class="io-reveal relative overflow-hidden rounded-3xl bg-base-100/55 backdrop-blur-md ring-1 ring-base-300/25 shadow-lg px-6 py-10 sm:px-12 sm:py-14"
     >
       <TopoLines
         count={14}
@@ -44,14 +45,14 @@ const items = [
       />
 
       <p
-        class="relative text-sm font-medium tracking-[0.16em] uppercase text-primary mb-2"
+        class="relative text-sm font-medium tracking-[0.16em] text-primary mb-2"
       >
-        Selected work
+        selected work
       </p>
       <h2
         class="relative font-slab font-bold text-base-content text-3xl sm:text-[2.5rem] tracking-tight mb-4"
       >
-        One thesis, four problems.
+        <TypeOnView client:visible text="one thesis, four problems." />
       </h2>
 
       <ul class="relative">

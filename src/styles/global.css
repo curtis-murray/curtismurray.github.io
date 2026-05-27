@@ -2,6 +2,14 @@ html {
   font-family: "Poppins", sans-serif;
 }
 
+/* Soft halo behind hero text that overlaps the darker ridges. Uses base-100, so
+   it's a cream glow in light and a dark glow in dark — lifting contrast against
+   base-content text either way. */
+.hero-haze {
+  text-shadow: 0 1px 2px oklch(var(--b1)), 0 0 22px oklch(var(--b1) / 0.9),
+    0 0 40px oklch(var(--b1) / 0.6);
+}
+
 /* Theme-toggle icon visibility, driven purely off [data-theme] on <html> so any
    number of toggle buttons stay correct with no JS and no flash.
    light now → offer the moon (to-dark); dark now → offer the sun (to-light). */
@@ -71,6 +79,7 @@ html {
   --mtn-6: #635a4d;
   --mtn-7: #3c372f;
   --topo-stroke: rgba(120, 84, 42, 0.16);
+  --dusk: #241a10;
 }
 
 /* Dark = "Catppuccin Mocha": distant ranges catch a mauve dusk glow, darkening
@@ -87,6 +96,7 @@ html {
   --mtn-6: #15151f;
   --mtn-7: #0d0d14;
   --topo-stroke: rgba(203, 166, 247, 0.12);
+  --dusk: #04040a;
 }
 
 #mtn-scene {
@@ -101,6 +111,47 @@ html {
 #mtn-scene svg {
   display: block;
 }
+
+/* Dusk scrim: a fixed gradient that deepens as you scroll, so the journey
+   descends into evening and lands on the dark footer. Opacity is set from
+   scroll progress by the MountainScene script. Sits above the mountains,
+   below the content — frosted panels pick the darkening up through their blur. */
+#mtn-dusk {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in oklab, var(--dusk) 35%, transparent) 55%,
+    var(--dusk) 100%
+  );
+  transition: opacity 0.2s linear;
+}
+
+/* Blinking caret for type-on-view headings (TypeOnView.jsx). */
+.type-caret {
+  display: inline-block;
+  width: 0.5ch;
+  height: 0.95em;
+  transform: translateY(0.12em);
+  margin-left: 0.1em;
+  border-radius: 2px;
+  background: oklch(var(--p) / 0.8);
+  animation: caretBlink 0.55s steps(1) infinite;
+}
+@keyframes caretBlink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .type-caret {
+    display: none;
+  }
+}
 .mtn-layer {
   /* depth-weighted scroll parallax: --d is 1 (back) … 7 (front); back moves
      least. --scroll is window.scrollY (unitless) set by the scene script. */
@@ -110,6 +161,22 @@ html {
     0
   );
   will-change: transform;
+}
+/* Slow, graceful drift of each ridge — alternating direction + per-layer phase
+   so the ranges gently breathe rather than slide together. Composes with the
+   parallax transform on the parent .mtn-layer group. */
+.mtn-wave {
+  animation: mtnWave var(--wdur, 26s) ease-in-out infinite alternate;
+  animation-delay: var(--wdelay, 0s);
+  will-change: transform;
+}
+@keyframes mtnWave {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(var(--wx, 8px), var(--wy, -3px), 0);
+  }
 }
 
 .topo-lines {
@@ -128,6 +195,9 @@ html {
   }
   .mtn-layer {
     transform: none;
+  }
+  .mtn-wave {
+    animation: none;
   }
 }
 

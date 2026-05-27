@@ -5,6 +5,7 @@ const email = "curtis@curtismurray.tech";
 const linkedIn = "https://www.linkedin.com/in/curtiswmurray/";
 const scholar =
   "https://scholar.google.com.au/citations?user=25fFcUUAAAAJ&hl=en&oi=ao";
+import TypeOnView from "./TypeOnView.jsx";
 ---
 
 <footer
@@ -12,11 +13,11 @@ const scholar =
 >
   <div class="container mx-auto px-6 lg:px-16 py-16 sm:py-24">
     <div class="io-reveal max-w-3xl">
-      <p class="text-sm font-medium tracking-[0.16em] uppercase opacity-70 mb-4">
-        Looking to join a team solving real problems
+      <p class="text-sm font-medium tracking-[0.16em] opacity-70 mb-4">
+        looking to join a team solving real problems
       </p>
-      <h2 class="font-slab font-bold text-4xl sm:text-5xl tracking-tight">
-        Let's build something you can trust.
+      <h2 class="font-slab font-bold text-4xl sm:text-5xl tracking-tight lowercase">
+        <TypeOnView client:visible text="let's build something you can trust." />
       </h2>
       <a
         href={`mailto:${email}`}
