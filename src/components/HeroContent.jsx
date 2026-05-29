@@ -6,7 +6,7 @@ const NAME = "hi, i'm curtis murray";
 // LLM stays uppercase; everything else lowercase.
 const TAG = "don't you hate it when your LLM starts hallucinating?";
 const PARA =
-  "me too...\ni did a phd betting on transparent models you could trust over black boxes you just hoped would work.\n wored out well...\n so anyway, i kept the rigour and moved it into the system around them.";
+  "me too...\ni did a phd betting on transparent models you could trust over black boxes you just hoped would work.\n worked out well...\n so anyway, i kept the rigour and moved it into the system around them.";
 
 // The one word that misbehaves on cue.
 const HALLU = "hallucinating";
