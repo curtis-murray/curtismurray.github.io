@@ -7,6 +7,7 @@ skill:
   - Knowledge Graphs
   - Clinical NLP
   - Bayesian Inference
+  - Statistics
   - Network Science
   - Applied Mathematics
 ---

@@ -1,11 +1,10 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Hero from "../components/Hero.astro";
-import StoryChapter from "../components/StoryChapter.astro";
+import StoryCard from "../components/StoryCard.jsx";
 import WorkList from "../components/WorkList.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 import GroundingLoop from "../components/GroundingLoop.jsx";
-import TypeOnView from "../components/TypeOnView.jsx";
 ---
 
 <Layout
@@ -14,63 +13,34 @@ import TypeOnView from "../components/TypeOnView.jsx";
 >
   <Hero />
 
-  <StoryChapter
-    id="thesis"
-    num="01"
-    eyebrow="the fix"
-    title="your LLM is confidently wrong, and you can't see where."
-  >
-    <p>
-      Constrain it to reason over real, verified entities and it can't invent
-      what isn't there. Evaluate every tool call and the reasoning has nowhere
-      to hide.
-    </p>
-    <p>
-      This is how I built the first working morphological analyser for spoken
-      Tamil — literary Tamil has had analysers for years; spoken Tamil had none.
-    </p>
-  </StoryChapter>
-
-  <!-- Interactive centerpiece: the propose → ground → dispose loop -->
-  <section id="grounding" class="relative py-12 sm:py-20">
+  <!-- the thesis + the propose → ground → dispose loop, stacked in one card.
+       the loop holds (startAfter) until the thesis above finishes typing. -->
+  <section id="thesis" class="relative py-16 sm:py-24">
     <div class="container mx-auto px-6 lg:px-16">
-      <div class="io-reveal mx-auto max-w-4xl">
-        <p
-          class="text-sm font-medium tracking-[0.16em] text-primary mb-2 text-center"
-        >
-          the pattern, made tangible
-        </p>
-        <h2
-          class="font-slab font-bold text-base-content text-3xl sm:text-[2.5rem] tracking-tight text-center mb-8"
-        >
-          <TypeOnView client:visible text="watch it refuse to make things up. grounding. neurosymbolically." />
-        </h2>
-        <GroundingLoop client:visible />
+      <div class="io-reveal mx-auto max-w-4xl rounded-3xl bg-base-100/60 backdrop-blur-md ring-1 ring-base-300/25 shadow-lg px-7 py-10 sm:px-12 sm:py-14">
+        <StoryCard
+          client:visible
+          title="your LLM is confidently wrong, and you can't see where."
+          bare
+          emitOnDone="thesis:typed"
+          body={[
+            "constrain it to reason over real, verified entities and it can't invent what isn't there. evaluate every tool call and the reasoning has nowhere to hide.",
+            "this is how I built the first working morphological analyser for spoken Tamil.",
+          ]}
+        />
+
+        <div id="grounding" class="mt-12 sm:mt-14 pt-10 sm:pt-12 border-t border-base-300/25">
+          <GroundingLoop
+            client:visible
+            bare
+            subtitle
+            startAfter="thesis:typed"
+            title="watch it refuse to make things up, neurosymbolically."
+          />
+        </div>
       </div>
     </div>
   </section>
-
-  <StoryChapter
-    num="02"
-    eyebrow="the throughline"
-    title="i've been doing one thing my whole career."
-  >
-    <p>
-      The tools keep changing. The job doesn't: <strong
-        class="text-base-content">messy, unstructured data in — trustworthy
-        structure out.</strong
-      > My PhD was applied maths and NLP, pulling the hidden structure out of online
-      health narratives with methods you could inspect and explain, not black boxes.
-      The result I'm proudest of: we picked up COVID anosmia signals in Reddit data
-      before they were widely recognised clinically.
-    </p>
-    <p>
-      I took the same instinct into a clinical project at RMIT — mapping messy
-      free-text notes onto verified medical entities — and beat string matching,
-      ClinicalBERT, and raw LLM generation by grounding every answer in a
-      trusted source instead of letting the model freelance.
-    </p>
-  </StoryChapter>
 
   <WorkList />
 

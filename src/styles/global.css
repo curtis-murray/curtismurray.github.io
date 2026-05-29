@@ -2,6 +2,21 @@ html {
   font-family: "Poppins", sans-serif;
 }
 
+/* Lenis smooth scroll (whole-page). Lenis adds .lenis/.lenis-smooth to <html>. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
 /* Soft halo behind hero text that overlaps the darker ridges. Uses base-100, so
    it's a cream glow in light and a dark glow in dark — lifting contrast against
    base-content text either way. */
@@ -105,8 +120,6 @@ html {
   height: 112%;
   z-index: -1;
   pointer-events: none;
-  transform: translate3d(var(--px, 0px), 0, 0);
-  will-change: transform;
 }
 #mtn-scene svg {
   display: block;
@@ -153,11 +166,12 @@ html {
   }
 }
 .mtn-layer {
-  /* depth-weighted scroll parallax: --d is 1 (back) … 7 (front); back moves
-     least. --scroll is window.scrollY (unitless) set by the scene script. */
+  /* depth-weighted parallax: --d is 1 (back) … 7 (front); back moves least.
+     --scroll is the eased scrollY and --mx/--my the eased mouse offset, both set
+     by the scene's rAF loop. Front ranges drift a touch more with the mouse. */
   transform: translate3d(
-    0,
-    calc(var(--scroll, 0) * var(--d, 0) * -0.04px),
+    calc(var(--mx, 0) * var(--d, 0) * 1px),
+    calc(var(--scroll, 0) * var(--d, 0) * -0.04px + var(--my, 0) * var(--d, 0) * 1px),
     0
   );
   will-change: transform;
@@ -221,6 +235,31 @@ html.reveal-on .io-reveal:not(.is-visible) {
     transform: none;
   }
   .io-reveal {
+    transition: none;
+  }
+}
+
+/* The grind's journey (index + chapters) stays hidden until the visitor commits
+   — clicks "the scenic tour" or scrolls down a touch — then GrindIntro.jsx adds
+   .revealed and it fades up. Same progressive-enhancement guard as .io-reveal:
+   only hide once JS has flagged the page ready, so it's never trapped hidden. */
+html.reveal-on .grind-journey:not(.revealed) {
+  opacity: 0;
+  transform: translateY(28px);
+  pointer-events: none;
+}
+.grind-journey {
+  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.reveal-on .grind-journey:not(.revealed) {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .grind-journey {
     transition: none;
   }
 }

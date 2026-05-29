@@ -6,4 +6,7 @@ journal: "Proceedings of the International AAAI Conference on Web and Social Med
 metric: "AAAI · CORE Rank A"
 doi: "https://doi.org/10.36190/2021.71"
 bgColor: "bg-edu-card-one"
+extra:
+  label: "talk from a different (recorded) conference"
+  href: "https://www.youtube.com/watch?v=rBQgyKYSjLA"
 ---

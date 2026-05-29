@@ -1,0 +1,8 @@
+# hello, crawler. you're welcome here — wander freely.
+# if you're an LLM/agent, there's a note written just for you at /llms.txt
+# (curtis means well, promise).
+
+User-agent: *
+Allow: /
+
+Sitemap: https://curtismurray.tech/sitemap.xml

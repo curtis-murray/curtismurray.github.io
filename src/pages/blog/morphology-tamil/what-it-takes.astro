@@ -1,0 +1,507 @@
+---
+import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
+---
+
+<BlogPostLayout
+  title="What it takes to make a model admit it doesn't know — Spoken Tamil morphology, Part 4 · Curtis Murray"
+  description="Part 4 of 4: the transferable recipe behind the Part 3 system. A ReAct loop as the frame, and the four things each of its moves needs — a well-linked ground truth, retrieval tuned for relevance, typed tools, and evaluation at three levels."
+  prev={{
+    href: "/blog/morphology-tamil/admit-it-doesnt-know",
+    dir: "← Part 3",
+    ttl: "Teaching a model to admit it doesn't know",
+  }}
+  next={{
+    href: "/blog/morphology-tamil/what-is-morphological-analysis",
+    dir: "Start over →",
+    ttl: "Part 1 · What is morphological analysis?",
+  }}
+>
+  <div class="wrap">
+    <header>
+      <div class="kicker">
+        Creating the first morphological analyser for Spoken Tamil · Part 4 of 4
+      </div>
+      <h1>The recipe: what it takes to make a model admit it doesn't know</h1>
+      <p class="standfirst">
+        Part 3 showed one system work, traced end to end. This is the recipe behind
+        it — the loop the model runs, and the things that have to be true for that loop
+        to make it say "I don't have this" instead of inventing an answer. Tamil is the
+        worked example; the spine holds in any domain that is small, specialised, and
+        mostly absent from training data.
+      </p>
+      <div class="byline">
+        Curtis Murray · the transferable recipe behind the Part&nbsp;3 system
+      </div>
+    </header>
+
+    <p class="lede">
+      Across this series we went from <a
+        href="/blog/morphology-tamil/what-is-morphological-analysis">what the problem is</a
+      > to <a href="/blog/morphology-tamil/where-llms-go-wrong">why a language model fails
+      at it invisibly</a> to <a href="/blog/morphology-tamil/admit-it-doesnt-know">a system
+      that doesn't</a>. That last post told the story of one run. This one pulls back to
+      the method, because the interesting part isn't Tamil — it's that the same handful of
+      ingredients make any model honest about the edge of its knowledge. Miss one and the
+      guarantee leaks: the model goes back to sounding confident about things it
+      has no basis for.
+    </p>
+
+    <p>
+      Here is the whole recipe in one view. Each row is a section below.
+    </p>
+
+    <figure>
+      <table class="data">
+        <thead>
+          <tr>
+            <th style="width:34px"></th>
+            <th>Ingredient</th>
+            <th>In one line</th>
+            <th>What breaks without it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="m">1</td>
+            <td><b>The loop the model runs</b></td>
+            <td>A defined ReAct loop — propose, ground, revise, commit — with a clear bar for "done": <em>groundedness, not confidence.</em></td>
+            <td>The model calls tools ad hoc and stops when it <em>feels</em> sure: Part&nbsp;2 all over again.</td>
+          </tr>
+          <tr>
+            <td class="m">2</td>
+            <td><b>A ground truth worth grounding in</b></td>
+            <td>A small, curated, <em>well-linked</em> store of what's actually attested — meaning flows through structure, never orphaned facts.</td>
+            <td>You ground in garbage and get confident garbage, just with a citation.</td>
+          </tr>
+          <tr>
+            <td class="m">3</td>
+            <td><b>Retrieval tuned for relevance</b></td>
+            <td>The query under the tool puts the <em>right</em> nodes in front of the model — minimal noise, minimal tokens.</td>
+            <td>The real answer is in the graph but never reaches the model, or arrives buried in distractors.</td>
+          </tr>
+          <tr>
+            <td class="m">4</td>
+            <td><b>Typed tools that expose it</b></td>
+            <td>A fixed set of schema-validated tools is the only path in; they wrap the queries and adjudicate writes.</td>
+            <td>The model runs raw queries, invents structure, and the curated store rots.</td>
+          </tr>
+          <tr>
+            <td class="m">5</td>
+            <td><b>Monitoring and evaluation</b></td>
+            <td>Three levels of signal — tool-call logging, reason-before / review-after annotations, and trajectory metrics + reflection — over a gold set when you have one.</td>
+            <td>"It works on the demo." You can't see drift, can't localise failure, can't improve on purpose.</td>
+          </tr>
+        </tbody>
+      </table>
+      <figcaption>
+        The recipe at a glance. Row 1 is the frame — the loop the model actually runs. The
+        four beneath it are what each move of that loop needs to be real rather than theatre.
+      </figcaption>
+    </figure>
+
+    <h2><span class="num">01</span>The loop the model runs</h2>
+
+    <p>
+      Start with the shape of the whole thing, because everything else hangs off it. The
+      method is a <strong>loop</strong>: the model proposes a hypothesis, grounds every
+      piece of it against a source of truth, treats a rejection as structured feedback and
+      revises, and commits only once nothing is left ungrounded. This is the
+      <strong>ReAct</strong> loop — <em>Reason, Act, Observe</em>, repeat — and the crucial
+      detail is the bar for "done": not the model's confidence, but
+      <strong>groundedness</strong>. It writes when everything resolves, not when it feels
+      sure. One definition, held throughout the series: <em>grounded</em> means every claim
+      resolves to attested structure in the graph through a typed validation path — not
+      "has a citation," not "came from retrieval," not "probably true."
+    </p>
+
+    <p>
+      Why insist on a loop at all, rather than just good tools? Because a model handed
+      excellent tools and no process will use them ad hoc — call a couple, form an
+      impression, and stop the moment it <em>feels</em> confident. That feeling is exactly
+      the failure from <a href="/blog/morphology-tamil/where-llms-go-wrong">Part&nbsp;2</a>:
+      fluent, confident, and wrong. A defined loop with a clear
+      <strong>committable target</strong> — a state it is allowed to write only once
+      everything checks out — is what converts a capable model from a confident guesser into
+      something that keeps checking until it actually has support, or reports that it can't
+      get any.
+    </p>
+
+    <div class="react" style="justify-content:center">
+      <span class="s">Reason: form / revise a hypothesis</span><span class="a">→</span>
+      <span class="s">Act: one tool call</span><span class="a">→</span>
+      <span class="s">Observe: structured feedback</span><span class="a">↺</span>
+      <span class="s">…until grounded</span><span class="a">→</span>
+      <span class="s">Act: atomic write</span>
+    </div>
+
+    <p>
+      The loop has three moves, and <strong>the rest of this post is what each move needs to
+      be real rather than theatre</strong>:
+    </p>
+
+    <ul class="takeaway">
+      <li>
+        <b>Act</b> grounds a claim against something it can't override — so it needs a
+        <em>well-linked ground truth</em> (§02), found through a <em>relevance-tuned
+        query</em> (§03), reached through a <em>typed tool</em> (§04). Three ingredients,
+        one move.
+      </li>
+      <li>
+        <b>Observe</b> turns the result into the structured feedback the model reasons over
+        next — and, scaled across runs, into the raw material for <em>evaluation</em> (§05).
+        A rejection isn't a dead end; it's an Observe that feeds the next Reason.
+      </li>
+      <li>
+        <b>Reason</b> is the move this section already covered: the process and the
+        committable target that keep the model honest about when it's allowed to stop.
+      </li>
+    </ul>
+
+    <p>
+      This is why ReAct pairs so naturally with grounding: its unit of work — one
+      Reason/Act/Observe step — is also the unit you <em>constrain</em>, the unit you
+      <em>log</em>, and the unit you <em>evaluate</em>. The loop is the connective tissue
+      that makes the four ingredients below composable and observable instead of a pile of
+      disconnected best practices.
+    </p>
+
+    <h2><span class="num">02</span>A ground truth worth grounding in</h2>
+
+    <p>
+      Take the <em>Act</em> move first: it grounds a claim against a source of truth. That
+      source is only as good as its contents — grounding in a noisy, half-attested, or
+      internally contradictory store just produces confident nonsense that now looks
+      sourced. So this ingredient is the least glamorous and the most load-bearing: a
+      <strong>small, curated, authoritative store</strong> that can only confirm or deny,
+      never generate. In the Tamil system that's a hand-verified Neo4j graph encoding
+      Schiffman's <em>Reference Grammar of Spoken Tamil</em>.
+    </p>
+
+    <p>
+      But size and curation aren't enough. The store has to be <strong>well-linked</strong>,
+      and in a specific way: meaning must flow through structure rather than hang off
+      individual facts. Part&nbsp;3's <a href="/blog/morphology-tamil/admit-it-doesnt-know#traced-run"
+        >triad</a
+      > is the example — the graph never draws a <code>Morpheme → meaning</code> edge,
+      because the same morpheme <span class="ta">(வி)டு</span> means different things in
+      different constructions. Meaning is read off the <em>Construction → Morpheme →
+      Concept</em> triple. That linking decision is what lets a claim like "this
+      <span class="ta">(வி)டு</span> means completive" be checked in a single query: it
+      either resolves to an existing triad or it doesn't. Orphaned facts can't be checked
+      that cleanly — there's nothing for a hypothesis to resolve <em>against</em>.
+    </p>
+
+    <div class="callout">
+      <span class="tag">The transferable bit</span>
+      <p>
+        Don't ask "do I have a knowledge base?" Ask "is meaning in my knowledge base
+        <em>relational</em> — can an arbitrary claim be reduced to 'does this specific
+        structure exist?'" If yes, an unsupported structural claim becomes catchable instead
+        of merely regrettable. If your facts are flat key→value strings, the model can still drift
+        between plausible neighbours and nothing will object.
+      </p>
+    </div>
+
+    <h2><span class="num">03</span>Retrieval tuned for relevance</h2>
+
+    <p>
+      Act can only ground against a fact it can actually <em>find</em> — which is a
+      different problem from having it. And here's the distinction that's easy to blur.
+      <span class="nm" style="font-family:var(--mono);color:var(--accent)">word_lookup</span>
+      is not the retrieval system — it's a <em>tool call</em>, a doorway. The retrieval
+      system is the <strong>query underneath it</strong>: the Cypher that ranks
+      surface-similar neighbours by longest common substring, caps the result set, and
+      returns them with match scores. The tool is the contract (ingredient 4); the query is
+      the information-retrieval engine, and it has to be tuned in its own right.
+    </p>
+
+    <p>
+      Tuned toward what, exactly? <strong>Maximising <em>relevant</em> retrieval</strong> —
+      which is not the same as maximising retrieval. The goal is to get the right nodes in
+      front of the model with as little noise as possible and as few tokens as possible.
+      There are two ways to fail, in opposite directions:
+    </p>
+
+    <ul class="toollist">
+      <li>
+        <span class="nm">Under-retrieval</span>
+        <div class="ds">
+          The relevant node exists in the graph but the query doesn't surface it — wrong
+          ranking, too tight a filter, the wrong entry point. The model, finding nothing,
+          falls back on its prior and <em>invents</em>. The graph had the answer; the
+          retrieval never delivered it.
+        </div>
+      </li>
+      <li>
+        <span class="nm">Over-retrieval</span>
+        <div class="ds">
+          The query dumps the whole neighbourhood — two hundred loosely related nodes —
+          and the one that matters is buried among distractors. Noise pulls the model
+          toward a plausible red herring, and every irrelevant node spends tokens and
+          attention you don't get back. More context is not more grounding.
+        </div>
+      </li>
+    </ul>
+
+    <p>
+      So the levers are all about precision: <strong>ranking and scoring</strong> so the
+      best candidates come first; <strong>capping</strong> result counts; returning a
+      <strong>tight closure</strong> (the triad, not a raw subgraph dump); and offering
+      <strong>multiple entry points</strong> — <span class="nm"
+        style="font-family:var(--mono);color:var(--accent)">search_*</span> reaches the
+      graph by surface form, by gloss, or by meaning, because you arrive at a problem
+      knowing different things on different turns. A perfectly curated graph (ingredient 2)
+      is inert if the right node never reaches the model, or reaches it drowned in a
+      hundred it didn't need.
+    </p>
+
+    <h2><span class="num">04</span>Typed tools that expose it</h2>
+
+    <p>
+      Both the graph and its queries reach the model through one narrow channel — and that
+      channel is the third thing <em>Act</em> needs. The model never touches the graph
+      directly. It can't run a query or hand-write a node. It gets a fixed set of
+      <strong>typed tools</strong> over the Model Context Protocol — schema-validated
+      requests, so a malformed call fails harmlessly instead of corrupting a curated store.
+      This is the layer where the queries from ingredient 3 are wrapped and exposed: one
+      typed tool is the stable, documented contract; the carefully tuned query is what runs
+      behind it. Keeping them separate matters — you re-tune the query without changing the
+      model's interface, and you constrain what the model can ask without constraining how
+      well the graph can answer.
+    </p>
+
+    <p>
+      Two properties earn their keep. First, the tools <strong>constrain the action
+      space</strong>: a fixed vocabulary of calls is the only path in, so the model can't
+      invent structure or reach around the guardrails. Second, they answer in
+      <strong>prose with embedded structured fields</strong>, never raw JSON — that forces
+      the model to weigh the evidence and judge, rather than branch on a magic number. And
+      the unglamorous invariants — validation, normalisation, atomic writes, the ~12 checks
+      before <span class="nm" style="font-family:var(--mono);color:var(--accent)"
+        >create_wordform</span> commits — live <em>once</em>, in code, instead of being
+      re-derived from a prompt every session.
+    </p>
+
+    <h2><span class="num">05</span>Monitoring and evaluation</h2>
+
+    <p>
+      The last ingredient is the <em>Observe</em> move scaled up — across one run, and then
+      across many. This is where most grounded systems are thinnest. "It works on the demo"
+      is not a measurement, and a single held-out accuracy number — useful as it is — misses
+      most of what you need to actually run and improve the thing. Evaluation here is a
+      <strong>stack of signals at three levels</strong>, most of which fall straight out of
+      logging the loop and need no external harness, plus the gold-standard accuracy eval on
+      top.
+    </p>
+
+    <ul class="toollist">
+      <li>
+        <span class="nm">Level 1 · Tool-call logging — the mechanical signals</span>
+        <div class="ds">
+          One structured line per call, keyed by session. The cheap, automatic, label-free
+          questions: <em>was the tool called? did it fail</em> (schema error, exception)?
+          <em>did it return anything, or null? how long did the call take? how many times
+          was each tool used?</em> These catch regressions and degenerate behaviour the
+          moment they appear — a tool that suddenly always returns null, a loop that calls
+          the same search forty times — with no annotation required.
+        </div>
+      </li>
+      <li>
+        <span class="nm">Level 2 · Reason-before / review-after — the intent signals</span>
+        <div class="ds">
+          The important addition, and the one people skip. <em>Before</em> each call the
+          agent states <strong>why</strong> it's making it and <strong>what it expects
+          back</strong>. <em>After</em>, it reviews: did the result match the expectation,
+          did the tool do its job, what were the pain points. Now a log line carries intent
+          + prediction + post-hoc judgement — so you can find where the model's picture of
+          the world diverged from the graph, not just where a call threw an error. A call
+          that "succeeded" but returned the opposite of what the agent predicted is invisible
+          at Level 1 and obvious here.
+        </div>
+        <div class="why">
+          <b>Why it matters:</b> errors are easy to log; <em>wrong but error-free</em> is
+          where grounded systems fail without throwing an error. Expectation-vs-result is how you surface it.
+        </div>
+      </li>
+      <li>
+        <span class="nm">Level 3 · Trajectory — the whole-run signals</span>
+        <div class="ds">
+          Per run: <em>how many tools were used, total wall-clock time, path length, how
+          many refine loops, did it reach a verified commit.</em> Plus
+          <strong>trajectory reflection</strong> — the agent looking back over the entire
+          run and saying what was hard and what it would do differently. Aggregate these
+          across many runs and you're measuring <em>behavioural drift</em>: the path getting
+          longer, refines climbing, time creeping up — a regression you'd never see from
+          a pass/fail on the final answer.
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <span class="tag">And the gold set, on top</span>
+      <p>
+        Everything above measures <em>consistency and behaviour</em> — that the system
+        grounded its claims and behaved sanely. It does <strong>not</strong> measure
+        <em>linguistic correctness</em>; for that you need a held-out, expert-annotated set
+        of segmentations and gloss-level accuracy. That set is still the open milestone for
+        the Tamil system, and I'd rather say so than imply a metric I don't have. The point
+        of the three levels is that you get most of your eval — and all of your drift
+        detection — long before, and independent of, the gold set.
+      </p>
+    </div>
+
+    <hr class="sec" />
+
+    <h2><span class="num">∴</span>Groundedness isn't robustness</h2>
+
+    <p>
+      The five ingredients share one unstated assumption: that a single run, fully
+      grounded, is a single run you can trust. It is grounded — but
+      <strong>grounded and robust are different properties</strong>, and the gap
+      between them is its own failure mode. A grounded agent isn't reasoning over
+      the whole knowledge base; it's reasoning over the slice its retrieval path
+      exposed. Every move in §01's loop — a search term, an
+      intermediate hypothesis, which neighbour it anchored on first — conditions the
+      hypothesis space the next move can even consider. Retrieval isn't passive evidence
+      access; it's active trajectory shaping. One unlucky early step (a slightly-off query,
+      an overconfident first guess) can steer the rest of the run into the wrong
+      region of the graph, and every later step can still be <em>perfectly grounded
+      relative to that trajectory</em>. The result isn't hallucination — Part&nbsp;3
+      watched the graph catch that. It's <strong>premature convergence</strong>: the
+      system confidently consistent inside a bad basin.
+    </p>
+
+    <p>
+      <a href="/blog/morphology-tamil/where-llms-go-wrong">Part&nbsp;2</a> already
+      used the cure once. Eight runs of the <em>ungrounded</em> model landed in
+      different basins, and that disagreement was the tell that it was generating,
+      not recovering. The grounded agent earns the same test — only now the variation
+      lives one level up, in the <em>trajectory</em> rather than the answer. Run it
+      several times — different temperatures, retrieval seeds, prompt phrasings, even
+      different model providers — and read the distribution. Agreement across
+      independent traces is evidence the conclusion is robust to how the search
+      unfolded; disagreement is the signal that the answer depends on the path taken
+      to reach it. This is repeated-sampling uncertainty in the spirit of
+      Monte-Carlo dropout: one run gives an answer, a spread of runs reveals
+      stability — though it stays a <em>diagnostic of instability, not a calibrated
+      probability</em>.
+    </p>
+
+    <p>
+      The catch: those traces aren't truly independent. They share an architecture, a
+      retrieval strategy, a tool vocabulary — and shared bias steers them the same
+      way. Ten runs of one brittle loop can converge on the same wrong basin and look
+      reassuringly stable. So vary what actually breaks the symmetry (different
+      providers especially, since they don't share priors), and lean on
+      <strong>post-run validation</strong>: re-check a finished trajectory against an
+      alternative trace, a verifier model, or a different retrieval strategy. The
+      goal isn't a majority vote for truth — it's detecting when a conclusion is
+      fragile to the search that produced it. None of which is free: every extra
+      trace, verifier pass and refine loop is more tokens and more wall-clock.
+      <strong>Reliability, here, is purchased with search</strong> — a real line on
+      the bill, not a rounding error, and worth spending deliberately rather than by
+      default.
+    </p>
+
+    <div class="callout">
+      <span class="tag">Four questions, not one</span>
+      <p>
+        <b>Groundedness</b> — did every claim resolve to attested structure? (§02–04)
+        &nbsp;·&nbsp; <b>Correctness</b> — does it match expert truth? (the gold set,
+        §05) &nbsp;·&nbsp; <b>Robustness</b> — do independent trajectories converge?
+        (this section) &nbsp;·&nbsp; <b>Calibration</b> — does it know when it might
+        be wrong? (<code>search_matching_wordforms</code> returning null). The recipe
+        nails the first; this section is how you stop mistaking it for the other
+        three.
+      </p>
+    </div>
+
+    <p>
+      The five ingredients make one run honest about the edge of the graph. This
+      makes you honest about the edge of the run.
+    </p>
+
+    <hr class="sec" />
+
+    <h2 style="text-align:center"><span class="num">★</span>What generalises</h2>
+
+    <p style="max-width:720px;margin:0 auto 18px;text-align:center;color:var(--dim)">
+      Three ways a grounded system still fails — and that they need three <em>different</em>
+      mechanisms to catch is the whole point:
+    </p>
+
+    <figure>
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Failure</th>
+            <th>Example</th>
+            <th>Caught by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Unsupported structure</b></td>
+            <td>an illegal allomorph; a relabelled morpheme</td>
+            <td class="m">grounding · §02–04</td>
+          </tr>
+          <tr>
+            <td><b>Wrong trajectory</b></td>
+            <td>a plausible but incomplete basin, reached by one bad early step</td>
+            <td class="m">robustness · multiple traces (∴)</td>
+          </tr>
+          <tr>
+            <td><b>Missing / wrong ontology</b></td>
+            <td>the graph lacks the phenomenon, or its schema mis-frames it</td>
+            <td class="m">human eval · the gold set (§05)</td>
+          </tr>
+        </tbody>
+      </table>
+      <figcaption>
+        Grounding catches only the first row. The reflex to watch for is assuming it catches
+        all three — it doesn't, and the other two are where confident, well-sourced systems
+        go wrong without any sign of it.
+      </figcaption>
+    </figure>
+
+    <div class="takeaway" style="max-width:820px;margin:16px auto 0">
+      <ul>
+        <li>
+          <b>The domain shape, not the domain.</b> This recipe earns its keep wherever the
+          ground truth is small, specialised, and largely absent from a model's training
+          data — Spoken Tamil morphology here, clinical entity linking in the work Part&nbsp;3
+          gestured at. Different field, identical spine.
+        </li>
+        <li>
+          <b>Each ingredient guards a different failure.</b> No loop and the model stops
+          when it feels sure; a bad store gives sourced nonsense; bad retrieval starves or
+          drowns the model; missing tools let it freelance; no eval hides the drift. They
+          aren't interchangeable, and the guarantee is only as strong as the weakest one —
+          and even all five guard only a single run: robustness is a separate axis, so run
+          it again, differently, and see if it agrees.
+        </li>
+        <li>
+          <b>What you get, honestly.</b> Consistency, observability, and a model that says
+          "I don't have this" instead of fabricating — <code>search_matching_wordforms</code>
+          returning null rather than inventing a parent. What you don't get for free is
+          omniscience. Grounding buys <em>provenance, not truth</em> — a claim resolves to
+          attested structure, which is not the same as being correct, and that gap is
+          exactly what the gold set measures. And it buys no new ground: absence from the
+          graph becomes absence from reality, so the system inherits the blind spots
+          of its substrate — and the assumptions baked into it, because a schema is a theory
+          and a construction an interpretation, not a neutral container. Which is the honest
+          tell about where the work went — the
+          expertise isn't discovered by the agent at run time; it was moved there ahead of
+          time, into the ontology, the schema, the retrieval shaping and the invariants the
+          model can't override. The recipe makes a model honest about the edge of its
+          knowledge. It doesn't move that edge — a human drew it.
+        </li>
+      </ul>
+    </div>
+
+    <footer>
+      <span class="src">source: logs/tool-calls.jsonl · the recipe behind the Part 3 run</span>
+      <span>Tamil Morphology MCP · neuro-symbolic agent system · Curtis Murray</span>
+    </footer>
+  </div><!-- /wrap -->
+</BlogPostLayout>

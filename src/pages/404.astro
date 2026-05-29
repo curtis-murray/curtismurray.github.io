@@ -1,0 +1,54 @@
+---
+import Layout from "../layouts/Layout.astro";
+import SiteFooter from "../components/SiteFooter.astro";
+import TypeOnView from "../components/TypeOnView.jsx";
+---
+
+<Layout
+  story
+  title="404 — Curtis Murray · this page is a hallucination"
+  description="There's no page here. Someone made it up."
+>
+  <section
+    class="relative flex min-h-[80vh] items-center justify-center px-6 py-20 lg:px-16"
+  >
+    <div
+      class="io-reveal mx-auto max-w-2xl rounded-3xl bg-base-100/60 backdrop-blur-md ring-1 ring-base-300/25 shadow-lg px-7 py-12 sm:px-12 sm:py-16 text-center"
+    >
+      <p
+        class="font-slab font-bold text-base-content/15 text-7xl sm:text-8xl tracking-tight leading-none"
+      >
+        404
+      </p>
+      <h1
+        class="mt-4 font-slab font-bold text-base-content text-3xl sm:text-4xl tracking-tight"
+      >
+        <TypeOnView
+          client:visible
+          text="oops — now you're the one hallucinating."
+        />
+      </h1>
+      <p class="mt-5 text-lg leading-relaxed text-base-content/75">
+        there's no page here. you (or a confidently-wrong link) made it up. the
+        whole point of this site is grounding outputs in things that actually
+        exist, so it'd be a bit awkward to leave you on one that doesn't.
+      </p>
+      <div class="mt-9 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href="/"
+          class="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-primary-content shadow-sm transition-colors hover:bg-primary/85"
+        >
+          back to something real
+        </a>
+        <a
+          href="/the-grind"
+          class="rounded-full px-6 py-2.5 text-sm font-medium text-base-content/75 ring-1 ring-base-300/50 transition-colors hover:text-base-content hover:ring-base-300"
+        >
+          the grind
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <SiteFooter />
+</Layout>

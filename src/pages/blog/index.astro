@@ -1,0 +1,105 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import TopoLines from "../../components/TopoLines.astro";
+
+// One series for now; the page is structured so adding more is just another
+// entry here.
+const series = {
+  eyebrow: "a 4-part series · neuro-symbolic LLM systems",
+  title: "Creating the first morphological analyser for Spoken Tamil",
+  blurb:
+  "Spoken Tamil is hard for language models to understand. Come see why, and how to get an LLM to break a Spoken Tamil word into its parts without inventing parts that don't exist. The series builds from “what is this even?” to a working neuro-symbolic system, traced end to end. Pages are interactive, so you don't need to know how to read Tamil script or even know what morphlogy is.",
+  parts: [
+    {
+      n: "01",
+      title: "What is morphological analysis?",
+      sub: "Breaking a word into its smallest meaningful pieces — and why Spoken Tamil has no algorithm to do it. The interactive primer; no Tamil required.",
+      href: "/blog/morphology-tamil/what-is-morphological-analysis",
+    },
+    {
+      n: "02",
+      title: "Where a language model goes wrong",
+      sub: "The same word, eight times, to a capable model: fluent, confident answers that don't agree — and the majority is wrong.",
+      href: "/blog/morphology-tamil/where-llms-go-wrong",
+    },
+    {
+      n: "03",
+      title: "Teaching a model to admit it doesn't know",
+      sub: "The fix: the model proposes, a curated knowledge graph disposes. A ReAct loop, typed tools, and a fully traced run.",
+      href: "/blog/morphology-tamil/admit-it-doesnt-know",
+    },
+    {
+      n: "04",
+      title: "The recipe: what it takes",
+      sub: "The transferable method behind the system — six things that have to be true to make a model admit it doesn't know, with ReAct as the spine.",
+      href: "/blog/morphology-tamil/what-it-takes",
+    },
+  ],
+};
+---
+
+<Layout
+  title="Blog — Curtis Murray"
+  description="Writing on grounding language models in something you can trust — starting with the first morphological analyser for Spoken Tamil."
+>
+  <PageHeader eyebrow="writing" title="here are some posts i've written" />
+
+  <p class="max-w-2xl text-base-content/70 leading-relaxed -mt-4 mb-10">
+    long-form pieces on the thing i keep coming back to: getting
+    models to produce structure you can actually trust.
+  </p>
+
+  <section class="relative">
+    <div
+      class="relative overflow-hidden rounded-2xl bg-base-200/50 ring-1 ring-base-300/40 px-6 py-9 sm:px-10 sm:py-11"
+    >
+      <TopoLines
+        count={14}
+        baseline={120}
+        spread={14}
+        class="pointer-events-none absolute right-0 top-0 h-full w-[60%] opacity-70"
+      />
+
+      <p class="relative text-sm font-medium tracking-[0.16em] text-primary mb-2">
+        {series.eyebrow}
+      </p>
+      <h2
+        class="relative font-slab font-bold text-base-content text-2xl sm:text-[2rem] tracking-tight leading-tight mb-4"
+      >
+        {series.title}
+      </h2>
+      <p class="relative max-w-2xl text-base-content/70 leading-relaxed mb-6">
+        {series.blurb}
+      </p>
+
+      <ul class="relative">
+        {
+          series.parts.map((part) => (
+            <li>
+              <a
+                href={part.href}
+                class="group grid grid-cols-[auto_1fr_auto] items-baseline gap-x-4 sm:gap-x-7 border-t border-base-content/15 py-5 sm:py-6 transition-colors"
+              >
+                <span class="font-slab text-sm text-base-content/40 tabular-nums">
+                  {part.n}
+                </span>
+                <div>
+                  <h3 class="font-slab text-xl sm:text-2xl font-semibold text-base-content leading-tight group-hover:text-primary transition-colors">
+                    {part.title}
+                  </h3>
+                  <p class="text-sm text-base-content/65 mt-1 max-w-xl">
+                    {part.sub}
+                  </p>
+                </div>
+                <span class="text-base-content/30 group-hover:text-primary group-hover:translate-x-1 transition-all">
+                  →
+                </span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</Layout>

@@ -225,13 +225,6 @@ declare module 'astro:content' {
   collection: "experience";
   data: any
 } & { render(): Render[".md"] };
-"experience-3.md": {
-	id: "experience-3.md";
-  slug: "experience-3";
-  body: string;
-  collection: "experience";
-  data: any
-} & { render(): Render[".md"] };
 "experience-4.md": {
 	id: "experience-4.md";
   slug: "experience-4";
@@ -278,20 +271,6 @@ declare module 'astro:content' {
   collection: "menu";
   data: any
 } & { render(): Render[".md"] };
-"item-3.md": {
-	id: "item-3.md";
-  slug: "item-3";
-  body: string;
-  collection: "menu";
-  data: any
-} & { render(): Render[".md"] };
-"item-4.md": {
-	id: "item-4.md";
-  slug: "item-4";
-  body: string;
-  collection: "menu";
-  data: any
-} & { render(): Render[".md"] };
 "item-5.md": {
 	id: "item-5.md";
   slug: "item-5";
@@ -302,6 +281,13 @@ declare module 'astro:content' {
 "item-6.md": {
 	id: "item-6.md";
   slug: "item-6";
+  body: string;
+  collection: "menu";
+  data: any
+} & { render(): Render[".md"] };
+"item-7.md": {
+	id: "item-7.md";
+  slug: "item-7";
   body: string;
   collection: "menu";
   data: any

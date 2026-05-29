@@ -1,0 +1,218 @@
+---
+import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
+---
+
+<BlogPostLayout
+  title="Where a language model goes wrong — Spoken Tamil morphology, Part 2 · Curtis Murray"
+  description="Part 2 of 4: the same Tamil word, eight times, to a capable model — fluent, confident answers that don't agree, and the majority is wrong."
+  prev={{
+    href: "/blog/morphology-tamil/what-is-morphological-analysis",
+    dir: "← Part 1",
+    ttl: "What is morphological analysis?",
+  }}
+  next={{
+    href: "/blog/morphology-tamil/admit-it-doesnt-know",
+    dir: "Part 3 →",
+    ttl: "Teaching a model to admit it doesn't know",
+  }}
+>
+  <div class="wrap">
+    <header>
+      <div class="kicker">
+        Creating the first morphological analyser for Spoken Tamil · Part 2 of 4
+      </div>
+      <h1>Where a language model goes wrong — and why you can't see it</h1>
+      <p class="standfirst">
+        Ask a capable model to break one Tamil word into its parts. Ask eight times.
+        You'll get fluent, confident, Leipzig-formatted answers that don't agree with
+        each other — and the majority is wrong. This is the production failure mode
+        that matters.
+      </p>
+      <div class="byline">
+        Curtis Murray · worked example: <span class="ta">படிச்சிட்டேன்</span> · every
+        Tamil word below is a live card
+      </div>
+    </header>
+
+    <p class="lede">
+      In <a href="/blog/morphology-tamil/what-is-morphological-analysis"
+        >Part&nbsp;1</a
+      > we did morphological analysis by hand: breaking <em>learners</em> into <code
+        >learn‑er‑s</code
+      >, and the Spoken Tamil word <span class="ta">படிச்சிட்டேன்</span> into four welded
+      pieces — <em>study</em> + a "having done it" participle + a "definitely finished"
+      auxiliary + "I". Tap the card to refresh it:
+    </p>
+
+    <div class="cardslot" data-w="படிச்சிட்டேன்"></div>
+
+    <p>
+      Part 1 ended on the catch: Spoken Tamil has no canonical algorithm to recover
+      those pieces from the surface string, so you reach for a language model. This
+      post is about what happens when you do — and why the result is more dangerous
+      than a plain wrong answer.
+    </p>
+
+    <p>
+      If you ask a large language model to do something it has seen a million examples
+      of, it is excellent. If you ask it to do something precise in a domain where
+      the ground truth is small, specialised, and largely absent from its training
+      data, it does something worse than fail — it produces a fluent, confident, plausible
+      answer that is wrong in ways you cannot see without being an expert yourself.
+      That is the failure mode that matters in production, and morphological analysis
+      of Spoken Tamil walks straight into it.
+    </p>
+
+    <p>
+      It's worth being concrete about <em>why</em> the ground truth is missing, because
+      Spoken Tamil is <strong>under-resourced</strong> in a way that compounds on itself.
+      Start with the <strong>agglutination</strong> from Part&nbsp;1: grammar is built by
+      stacking morphemes onto a root — and not just tense but aspect, mood, person,
+      number, modality, all welded on at once. Where English gives one root a handful of
+      forms (<em>run, ran, runs, running</em>), a single Tamil root spins off
+      <em>thousands</em> of distinct words, and — as every card here shows — the morpheme
+      boundaries don't survive in the finished surface form. Now <strong>multiply</strong>
+      that: Tamil is dialectally diverse, so each dialect has its own way of forming those
+      thousands of variants. And none of it is <strong>standardised</strong> — no
+      canonical dialect, no agreed spelling, often not even agreement <em>within</em> a
+      dialect — so there is no single target to aim at, and what little data exists is
+      noisy and inconsistent.
+    </p>
+
+    <p>
+      Then the kicker, the one that empties the training set outright: Spoken Tamil has
+      <strong>diverged from Literary Tamil</strong>, the formal written register whose
+      script has barely changed in a thousand years. Essentially all written Tamil —
+      documents, news, books, the web — is Literary. Spoken Tamil is <em>spoken</em>; it
+      is hardly ever written down, surfacing mostly in places like film subtitles. So a
+      model trained on the world's text has seen vast amounts of a <em>different</em>
+      register and almost none of this one. Tiny corpus, astronomically large form-space:
+      nearly every spoken word the analyser meets is one the model has effectively never
+      seen. There is no fact to recover — only a plausible fiction to generate.
+    </p>
+
+    <p>
+      I didn't have to invent a cautionary example. I gave a capable model the same
+      one word, <span class="ta">படிச்சிட்டேன்</span>, with the same prompt, eight times.
+      Every answer was fluent, Leipzig-formatted, and sure of itself. They did not agree
+      with each other. Collapsing the duplicates, here are the distinct analyses it
+      returned:
+    </p>
+
+    <table class="data" style="margin:18px 0">
+      <thead>
+        <tr>
+          <th class="m" style="width:1%">#</th>
+          <th>Segmentation it returned</th>
+          <th class="m">Its Leipzig gloss</th>
+          <th>What it claims the middle piece is</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="m">A</td>
+          <td class="m"><span class="ta">படி‑ச்ச்‑இட்ட்‑ஏன்</span> · paṭi‑cc‑iṭṭ‑ēṉ</td>
+          <td class="m">read‑<span style="color:var(--bad)">PST</span>‑CMPL‑1SG</td>
+          <td>
+            <span style="color:var(--bad)"
+              >‑ச்ச்‑ is the <strong>past tense</strong></span
+            >; the completive is separate
+          </td>
+        </tr>
+        <tr>
+          <td class="m">B</td>
+          <td class="m"><span class="ta">படி‑ச்சு‑ட்ட்‑ஏன்</span> · paḍi‑cc‑ṭṭ‑ēn</td>
+          <td class="m">read‑<span style="color:var(--bad)">PST</span>‑COMPL‑1SG</td>
+          <td>
+            <span style="color:var(--bad)">same theory</span>, but the segment boundary
+            &amp; romanisation moved
+          </td>
+        </tr>
+        <tr>
+          <td class="m">C</td>
+          <td class="m"
+            ><span class="ta">படி‑ச்சு‑(வி)ட்ட்‑ஏன்</span> · paṭi‑ccu‑(v)iṭṭ‑ēṉ</td
+          >
+          <td class="m"
+            >read‑<span style="color:var(--good)">CVB</span>‑COMPL.PST‑1SG</td
+          >
+          <td>
+            <span style="color:var(--good)"
+              >‑ச்சு‑ is the <strong>converb</strong></span
+            > (not tense); tense rides on the completive
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Look at what they agree on: the root <span class="ta">படி</span> "read", the suffix
+      <span class="ta">ஏன்</span> "1SG", the whole-word translation, and the literary
+      equivalent <span class="ta">படித்துவிட்டேன்</span>. Every part a non-expert could
+      spot-check is correct and consistent. Now look at where they split: <strong
+        >is <span class="ta">‑ச்சு‑</span> the past tense, or the converb — the "having
+        ___" participle — with tense carried by the completive auxiliary?</strong
+      > That is not a detail. It is two different theories of what the word <em>is</em>.
+      The model picks one or the other at random across runs, and never once says it
+      is choosing.
+    </p>
+
+    <p>
+      It gets worse: the confident majority is the wrong one. Reading C — converb plus
+      a completive that carries the past — is the defensible analysis; it is exactly
+      how the literary form <span class="ta">படித்துவிட்டேன்</span> decomposes, and it
+      is the reading the grounded system commits to (you'll watch it do so in Part&nbsp;3).
+      The two-to-one majority that calls <span class="ta">‑ச்சு‑</span> "past tense"
+      is the more fluent and the more wrong. A reviewer trusting the majority ships
+      the error.
+    </p>
+
+    <p>
+      That single experiment contains the three failure modes worth naming:
+    </p>
+
+    <p>
+      <strong>1. It invents or relabels a morpheme.</strong> Calling the converb "PST"
+      isn't a typo — it's a plausible-looking category assigned to a slot that doesn't
+      hold it. Fiction in a citation voice.
+    </p>
+
+    <p>
+      <strong>2. It picks an illegal allomorph.</strong> The morpheme is real but the
+      form is one the language never uses in that position — a notation that <em
+        >looks</em
+      > like Tamil and is not. (You will watch this happen, exactly once, in the traced
+      run in Part&nbsp;3: a past-tense form written with a stray <em>pulli</em>.)
+    </p>
+
+    <p>
+      <strong>3. It lets the gloss drift.</strong> <code>study</code> where the established
+      label is <code>read/study</code>; <code>cc</code> here, <code>ccu</code> there,
+      <code>ச்ச்</code> vs <code>ச்சு</code> for the same claim. Harmless-looking,
+      corrosive over time, and invisible in prose.
+    </p>
+
+    <p>
+      All of it is <em>fluent, confident, plausible, and unverifiable by a non-expert</em>
+      — the failure mode that actually matters in production. Note the deeper tell: a
+      model that was <em>recovering</em> a fact would be stable across runs. One that
+      is <em>generating</em> a plausible analysis has more than one basin, and lands
+      in a different one each time. The fix is therefore not a better prompt or more
+      samples. It is to stop letting the model be the source of truth about what exists.
+    </p>
+
+    <div class="callout">
+      <span class="tag">Next in the series</span>
+      <p>
+        If the model can't be trusted to know what's real, give it something that can
+        — a curated graph of every morpheme, construction and rule that's actually attested,
+        and make the model check every claim against it before it's allowed to write
+        anything down. <strong
+          >Part&nbsp;3: <a href="/blog/morphology-tamil/admit-it-doesnt-know"
+            >Teaching a model to admit it doesn't know — by forcing it to find evidence</a
+          >.</strong
+        >
+      </p>
+    </div>
+  </div><!-- /wrap -->
+</BlogPostLayout>

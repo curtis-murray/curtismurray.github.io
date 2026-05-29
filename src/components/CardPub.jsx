@@ -1,29 +1,36 @@
 import PropTypes from "prop-types";
 
-// Publication entry — links to the DOI.
+// Publication entry. The whole card is a link to the DOI (via a stretched
+// title link), and an optional `extra` link (e.g. a live dashboard or a
+// conference talk) sits above it with its own click target — so we get a
+// secondary action without nesting anchors.
 const CardPub = ({ details }) => {
+  const { doi, year, metric, title, authors, journal, extra } = details.data;
+
   return (
-    <a
-      href={details.data.doi}
-      className="group block bg-base-200/60 ring-1 ring-base-300/50 py-5 px-5 space-y-2 mb-5 rounded-xl transition-colors hover:ring-primary/50"
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <div className="group relative bg-base-200/60 ring-1 ring-base-300/50 py-5 px-5 space-y-2 mb-5 rounded-xl transition-colors hover:ring-primary/50">
       <div className="flex items-center gap-2 flex-wrap">
         <span className="text-xs font-medium tracking-wide uppercase text-primary">
-          {details.data.year}
+          {year}
         </span>
-        {details.data.metric && (
+        {metric && (
           <span className="text-xs px-2 py-0.5 rounded-full bg-primary text-primary-content font-medium">
-            {details.data.metric}
+            {metric}
           </span>
         )}
       </div>
       <h3 className="text-xl font-semibold text-base-content group-hover:text-primary transition-colors">
-        {details.data.title}
+        <a
+          href={doi}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="after:absolute after:inset-0 after:rounded-xl"
+        >
+          {title}
+        </a>
       </h3>
       <p className="text-base-content/75">
-        {details.data.authors.map((author, i) => (
+        {authors.map((author, i) => (
           <span key={i}>
             {i > 0 && ", "}
             {author === "Curtis Murray" ? (
@@ -34,11 +41,21 @@ const CardPub = ({ details }) => {
           </span>
         ))}
       </p>
-      <p className="text-base-content/75 italic">{details.data.journal}</p>
-      <span className="text-xs text-base-content/50">
-        DOI: {details.data.doi}
-      </span>
-    </a>
+      <p className="text-base-content/75 italic">{journal}</p>
+      <div className="flex items-center gap-x-4 gap-y-1 flex-wrap">
+        <span className="text-xs text-base-content/50">DOI: {doi}</span>
+        {extra?.href && (
+          <a
+            href={extra.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative z-10 text-xs font-medium text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary transition-colors"
+          >
+            {extra.label} →
+          </a>
+        )}
+      </div>
+    </div>
   );
 };
 
@@ -52,6 +69,10 @@ CardPub.propTypes = {
       journal: PropTypes.string,
       metric: PropTypes.string,
       doi: PropTypes.string,
+      extra: PropTypes.shape({
+        label: PropTypes.string,
+        href: PropTypes.string,
+      }),
     }),
   }),
 };

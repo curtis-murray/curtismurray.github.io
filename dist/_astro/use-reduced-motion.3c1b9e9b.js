@@ -1,0 +1,1 @@
+import{r as o}from"./index.8365acb2.js";const s=typeof window<"u",t={current:null},n={current:!1};function c(){if(n.current=!0,!!s)if(window.matchMedia){const e=window.matchMedia("(prefers-reduced-motion)"),r=()=>t.current=e.matches;e.addListener(r),r()}else t.current=!1}function u(){!n.current&&c();const[e]=o.useState(t.current);return e}export{c as a,n as h,s as i,t as p,u};

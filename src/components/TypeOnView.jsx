@@ -3,7 +3,11 @@ import { useReducedMotion } from "framer-motion";
 
 // Types `text` out once, when the island hydrates (client:visible → roughly
 // when it scrolls into view). Reduced-motion shows the full text immediately.
-export default function TypeOnView({ text, speed = 26 }) {
+//
+// Reflow-safe: an invisible copy of the FULL text reserves the final size and
+// line-wrapping up front, and the typed characters are painted on top
+// (absolutely positioned), so surrounding content never shifts while it types.
+export default function TypeOnView({ text, speed = 33 }) {
   const reduce = useReducedMotion();
   const [n, setN] = useState(0);
 
@@ -23,10 +27,20 @@ export default function TypeOnView({ text, speed = 26 }) {
   }, [text, speed, reduce]);
 
   const done = n >= text.length;
+
+  if (reduce) return <>{text}</>;
+
   return (
-    <>
-      {text.slice(0, n)}
-      {!reduce && !done && <span className="type-caret" aria-hidden="true" />}
-    </>
+    <span className="relative block">
+      {/* sizer: full text, real wrap → locks height + line positions */}
+      <span className="invisible" aria-hidden="true">
+        {text}
+      </span>
+      {/* typed overlay, left/top aligned over the sizer */}
+      <span className="absolute inset-0">
+        {text.slice(0, n)}
+        {!done && <span className="type-caret" aria-hidden="true" />}
+      </span>
+    </span>
   );
 }

@@ -1,0 +1,150 @@
+/* ============================================================================
+   morphology-cards.css — the interactive Tamil layer.
+   Clickable word spans (.tw), the karaoke highlight, the word popup / card
+   (.pop), the morpheme hover-info card (.minfo), inline worked-example cards
+   (.cardslot / .cardpair) and the mobile bottom-sheet.
+   Driven by morphology-engine.js + morphology-data.js + audio-data.js.
+
+   Ported to the redesign site: all colours route through the theme vars
+   defined in blog.css (which map to DaisyUI tokens), so the layer flips with
+   the site theme. Warm-brown shadows go neutral so they read on dark too.
+   ========================================================================== */
+
+.tw{cursor:pointer;border-radius:3px;transition:background .12s,box-shadow .12s;
+    text-underline-offset:3px;text-decoration:underline;
+    text-decoration-color:oklch(var(--p) / 0.45);text-decoration-thickness:1px}
+.tw:hover{background:oklch(var(--p) / 0.18);text-decoration-color:var(--accent)}
+.tw.playing{background:oklch(var(--p) / 0.22)}
+.tw .g{transition:opacity .14s ease,color .14s ease}
+.tw.playing .g{color:var(--accent)}
+.seg .tw,h1 .tw{text-decoration:none}
+.hint{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+    background:var(--panel);border:1px solid var(--line);color:var(--ink);
+    font:600 12px/1 var(--mono);padding:9px 15px;border-radius:999px;z-index:80;
+    box-shadow:0 6px 22px rgba(0,0,0,.28);transition:opacity .4s;pointer-events:none}
+.pop-back{position:fixed;inset:0;z-index:90;background:rgb(0 0 0 / .25)}
+.pop{position:fixed;z-index:91;width:392px;max-width:calc(100vw - 24px);
+    max-height:calc(100vh - 28px);overflow-y:auto;
+    background:linear-gradient(180deg,var(--panel-hi),var(--panel));
+    border:1px solid var(--line);border-radius:12px;
+    box-shadow:0 18px 50px rgba(0,0,0,.35);animation:pop .14s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.pop .tw{text-decoration:none}            /* no underline on Tamil in the card */
+.pop .ph{padding:16px 46px 17px;position:sticky;top:0;background:var(--panel-hi);
+    z-index:1;text-align:center;
+    box-shadow:0 1px 0 oklch(var(--bc) / 0.14)}
+.pop .ph .navg{position:absolute;top:14px;left:14px;display:flex;gap:5px}
+.pop .ph .flag{position:absolute;top:16px;right:16px;color:var(--dim);
+    opacity:.45;font-size:14px;line-height:1;user-select:none}
+.pop .navb{width:25px;height:25px;border:1px solid transparent;
+    background:transparent;border-radius:7px;color:var(--dim);
+    font-size:15px;cursor:pointer;line-height:1;padding:0;
+    transition:color .12s,background .12s}
+.pop .navb:hover:not(:disabled){color:var(--accent);background:oklch(var(--p) / 0.12)}
+.pop .navb:disabled{opacity:.28;cursor:default}
+.pop .pw{display:inline-block;font-family:var(--tamil);font-size:29px;
+    color:var(--accent);cursor:pointer;line-height:1.18}
+.pop .pw:hover{filter:brightness(.94)}
+.pop .psub{margin-top:6px;font-size:14.5px;color:var(--ink);font-style:italic}
+.pop .pr{display:block;margin-top:6px;font-family:var(--mono);
+    font-size:11.5px;color:var(--dim);letter-spacing:.02em}
+.pop .pb{padding:0 0 6px}
+.pop .sec{padding:16px 20px}
+.pop .sec + .sec{border-top:1px solid oklch(var(--bc) / 0.14)}
+.pop .seclabel{font:700 10px/1 var(--mono);letter-spacing:.15em;
+    text-transform:uppercase;color:var(--dim);margin:0 0 13px}
+/* inline segmentation: morpheme + morpheme, clean gloss beneath */
+.pop .sec.segsec{background:oklch(var(--p) / 0.06)}
+.pop .pgrid{display:flex;flex-wrap:wrap;justify-content:center;
+    align-items:flex-start;gap:12px 0}
+.pop .pmor{display:flex;flex-direction:column;align-items:center;gap:7px;
+    padding:0 11px;cursor:pointer}
+.pop .pmor .ct{font-family:var(--tamil);font-size:22px;color:var(--accent);
+    line-height:1.1;white-space:nowrap}
+.pop .pmor:hover .ct{filter:brightness(.92)}
+.pop .pmor .cg{font:600 10.5px/1 var(--mono);color:var(--dim);
+    letter-spacing:.04em;padding-bottom:2px;
+    border-bottom:1px solid oklch(var(--bc) / 0.3)}
+.pop .pplus{align-self:flex-start;color:var(--dim);opacity:.5;
+    font-size:15px;padding:3px 6px 0}
+/* description */
+.pop .pd{color:var(--ink-soft);font-size:13.5px;line-height:1.68}
+.pop .pd em{color:var(--ink);font-style:italic}
+.pop .pd code{background:var(--panel2);color:var(--code)}
+/* progressive build chain — borderless, hairline rows */
+.pop .brow{display:flex;gap:12px;align-items:baseline;padding:10px 2px;
+    font-family:var(--mono);border-bottom:1px solid oklch(var(--bc) / 0.13)}
+.pop .brow:last-child{border-bottom:0}
+.pop .brow.cur{background:oklch(var(--p) / 0.13);
+    margin:0 -20px;padding-left:20px;padding-right:20px;border-bottom:0}
+.pop .brow .bw{font-family:var(--tamil);font-size:16px;color:var(--accent);
+    cursor:pointer;min-width:104px}
+.pop .brow .bw:hover{filter:brightness(.92)}
+.pop .brow .badd{font-size:11px;color:var(--purple);min-width:62px}
+.pop .brow .bm{font:400 12px/1.5 -apple-system,sans-serif;color:var(--dim);flex:1}
+.pop .brow .bs{font:700 9px/1 var(--mono);color:var(--good);align-self:center}
+.pop .pf{padding:12px 20px;
+    color:var(--dim);font:600 10.5px/1.4 var(--mono);
+    box-shadow:0 -1px 0 oklch(var(--bc) / 0.14);
+    display:flex;justify-content:space-between;gap:10px;
+    position:sticky;bottom:0;background:var(--panel-hi)}
+.pop .pf b{color:var(--good)}
+/* morpheme hover-info card (app-style) */
+.minfo{position:fixed;z-index:95;width:248px;max-width:calc(100vw - 20px);
+    background:var(--panel-hi);border:1px solid var(--line);border-radius:11px;
+    box-shadow:0 14px 38px rgba(0,0,0,.35);padding:15px 17px;
+    animation:pop .12s ease-out}
+.minfo .mw{font-family:var(--tamil);font-size:23px;color:var(--accent);
+    cursor:pointer;line-height:1.1}
+.minfo .mw:hover{filter:brightness(.93)}
+.minfo .mg{display:inline-block;margin-left:9px;font:700 10px/1 var(--mono);
+    letter-spacing:.09em;color:var(--purple);vertical-align:2px}
+.minfo .mt{margin-top:9px;font-size:13px;color:var(--ink);font-weight:680}
+.minfo .md{margin-top:5px;font-size:12px;line-height:1.6;color:var(--dim)}
+.minfo .md code{background:var(--panel2);color:var(--code);font-size:.92em}
+.minfo .md em{color:var(--ink);font-style:italic}
+/* inline worked-example card (same component, embedded in the article) */
+.cardslot{margin:26px 0}
+/* two inline cards side by side. The article column is 680px, which squeezes a
+   pair, so on wide viewports we break the pair out of the column and re-centre
+   it: margin-left:50% + translateX(-50%) centres on the column's centre, which
+   coincides with the panel/viewport centre. Widths are capped to stay inside
+   the translucent reading panel's content box at each breakpoint — panel inner
+   ≈ container (lg 1024 / xl 1280) − container px (lg:px-10) − panel padding
+   (lg:p-12) ≈ 848px / 1104px — so the pair never overhangs the panel's edge. */
+.cardpair{display:flex;gap:24px;align-items:flex-start;justify-content:center;
+    margin:28px 0;width:100%}
+.cardpair .cardslot{margin:0;flex:1 1 0;min-width:0}
+.cardpair .pop.inline{max-width:100%;margin:0}
+@media (min-width:1024px){
+  .cardpair{width:800px;margin-left:50%;transform:translateX(-50%)}
+}
+@media (min-width:1280px){
+  .cardpair{width:1040px}
+}
+@media (max-width:720px){
+  .cardpair{flex-direction:column;align-items:center}
+  .cardpair .cardslot{width:100%;max-width:560px}
+}
+/* display:block guards against Tailwind's `.inline` utility (display:inline),
+   which the shared `inline` class name otherwise collides with — an inline box
+   here opens a stray line-box at the top of the card, exposing the border as a
+   vertical sliver above the header. */
+.pop.inline{display:block;position:static;width:auto;max-width:560px;margin:0 auto;
+    max-height:none;overflow:hidden;animation:none}
+.pop.inline .ph,.pop.inline .pf{position:static}
+.pop.inline .ph{padding-left:20px;padding-right:20px}
+/* English example uses the body font, not the Tamil serif */
+.pop .pw.en{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:25px;font-weight:760;letter-spacing:-.01em}
+.pop .pmor .ct.en{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    font-size:18px;font-weight:680}
+.pop .brow .bw.en,.minfo .mw.en{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+.minfo .mw.en{font-size:19px;font-weight:720}
+@media (max-width:560px){
+  .pop.inline{max-width:100%}
+  .pop:not(.inline){left:0!important;right:0!important;bottom:0!important;top:auto!important;
+      width:100%;max-width:100%;max-height:82vh;border-radius:14px 14px 0 0;
+      animation:sheet .2s ease-out}
+  @keyframes sheet{from{transform:translateY(100%)}to{transform:none}}
+}

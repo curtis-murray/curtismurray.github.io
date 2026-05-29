@@ -1,0 +1,224 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import Card from "../components/Card";
+import CardPub from "../components/CardPub";
+import Tag from "../components/Tag";
+import JourneyRail from "../components/JourneyRail.jsx";
+import GrindIntro from "../components/GrindIntro.jsx";
+import SiteFooter from "../components/SiteFooter.astro";
+import {
+  LuGraduationCap,
+  LuBriefcase,
+  LuFileText,
+  LuLightbulb,
+  LuWrench,
+} from "react-icons/lu";
+
+const education = await getCollection("education");
+const experience = await getCollection("experience");
+const publications = await getCollection("publications");
+const knowledges = await getCollection("knowledges");
+
+const tools = [
+  "Python", "TypeScript", "Claude Code", "MCP", "PyTorch", "HuggingFace",
+  "TensorFlow", "Neo4j", "AWS Bedrock", "GCP", "Docker", "PostgreSQL",
+  "SQL", "R", "Bash", "Git", "Slurm HPC", "LaTeX",
+];
+
+const featured = [
+  {
+    meta: "2025 – Present · AI Engineer | Tech Founder · Neuro-Symbolic Agentic AI",
+    title: "Spoken Tamil Morphology Analyser",
+    stack:
+      "Python · TypeScript · Custom MCP server · Neo4j · LLM agent orchestration",
+    body: [
+      "The first working computational morphological analyser for spoken Tamil. Spoken Tamil is highly agglutinative and non-standardised across dialects, with no canonical rules to unpack surface forms — a setting where direct LLM generation is unreliable. It runs a ReAct loop: the agent proposes a segmentation hypothesis, validates it against a ~1,000-node Neo4j knowledge graph via a custom MCP server, observes the structured feedback, and refines — iterating until the segmentation grounds to verified graph entities, reducing hallucination by constraining outputs to the graph.",
+      "The MCP server exposes 12 Zod-validated typed tools that return structured prose with embedded scores and IDs, roughly 3–5× cheaper per call than the JSON equivalent. It runs as a multi-agent system with agent-to-agent (A2A) delegation across non-overlapping roles — analyst, validator, and grammar-reference sub-agents — where the validator fans out to N parallel analysts. Every tool call is written to a structured trajectory stream with automated graph-health invariant checks, giving per-run observability without an external eval framework.",
+    ],
+    note: {
+      pre: "i wrote a series of ",
+      link: "posts",
+      href: "/blog/morphology-tamil/what-is-morphological-analysis/",
+      post: " on this.",
+      external: false,
+    },
+  },
+  {
+    meta: "2025 – Present · Tech Founder · Full-Stack EdTech",
+    title: "Kathaivazhi: Tamil Language Learning Platform",
+    stack: "React · Express · PostgreSQL · Neo4j",
+    body: [
+      "EdTech platform for Tamil diaspora learners. Click-to-analyse words with morphological breakdown via the analyser above, spaced repetition, and learner progression tracking. Pre-launch.",
+    ],
+  },
+  {
+    meta: "2024 – 2025 · Clinical NLP at RMIT / UoM",
+    title: "RAG Pipeline for Clinical Entity Linking",
+    stack:
+      "Python · ClinicalBERT · Vector search · LLM adjudication · Slurm HPC",
+    body: [
+      "Mapped free-text clinical mentions to ontology codes (DrugBank, RxNorm) by embedding ontology entities, retrieving candidates via similarity search, and adjudicating with an LLM. Direct LLM generation hallucinated codes about half the time — unacceptably dangerous in clinical settings. The retrieval-plus-adjudication pattern outperformed string matching, ClinicalBERT embeddings, and direct generation on F1, because constraining the LLM to choose between real candidates prevents it from inventing codes that don't exist.",
+      "Added an LLM-driven query reformulation loop (e.g., brand → generic drug name) that measurably improved hit rates on hard cases. Built inside a regulated clinical data environment with governance and privacy constraints; presented to clinical stakeholders at MCBK 2024.",
+    ],
+    note: {
+      pre: "watch a ",
+      link: "conference talk",
+      href: "https://www.youtube.com/watch?v=1x3w-djHEro",
+      post: " i presented on this.",
+      external: true,
+    },
+  },
+];
+
+// Single source of truth for the chapters: the rail navigates these ids, and
+// the sections below carry the matching id + heading. `rail` is the short label
+// in the sticky nav; `heading` is the full, exact chapter title.
+const chapters = [
+  { id: "studied", rail: "things i studied", heading: "things i've studied" },
+  { id: "jobs", rail: "jobs jobs jobs", heading: "jobs jobs jobs" },
+  {
+    id: "papers",
+    rail: "papers",
+    heading: "things i paid someone so you could pay to read them*",
+  },
+  { id: "projects", rail: "some cool things", heading: "some cool things" },
+  { id: "toolkit", rail: "the toolkit", heading: "the toolkit" },
+];
+
+const sectionClass =
+  "io-reveal scroll-mt-28 rounded-3xl bg-base-100/60 backdrop-blur-md ring-1 ring-base-300/25 shadow-lg px-6 py-8 sm:px-10 sm:py-12";
+const headingClass =
+  "font-slab text-2xl sm:text-3xl font-semibold text-base-content";
+---
+
+<Layout
+  story
+  title="the grind — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
+>
+  {/* Intro: a full-screen, dramatic opening — types the title, then fades the
+      rest up. The "scenic tour" / a small scroll commits you to the journey. */}
+  <div class="container mx-auto px-6 lg:px-16">
+    <GrindIntro client:load />
+  </div>
+
+  {/* Journey: sticky rail + chapter sections. Hidden (the .grind-journey gate)
+      until the intro reveals it — by click or by the first scroll down. */}
+  <div id="journey" class="grind-journey container mx-auto px-6 lg:px-16 pt-12 pb-24">
+    <div
+      class="lg:grid lg:grid-cols-[200px_1fr] xl:grid-cols-[220px_1fr] lg:gap-12"
+    >
+      <JourneyRail chapters={chapters} client:idle />
+
+      <div class="space-y-12 sm:space-y-16 min-w-0">
+        {/* things i've studied */}
+        <section id="studied" class={sectionClass}>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-3xl text-primary"><LuGraduationCap /></span>
+            <h2 class={headingClass}>{chapters[0].heading}</h2>
+          </div>
+          {education.map((details) => <Card details={details} />)}
+        </section>
+
+        {/* jobs jobs jobs */}
+        <section id="jobs" class={sectionClass}>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-3xl text-primary"><LuBriefcase /></span>
+            <h2 class={headingClass}>{chapters[1].heading}</h2>
+          </div>
+          {experience.map((details) => <Card details={details} />)}
+        </section>
+
+        {/* things i paid someone so you could pay to read them* */}
+        <section id="papers" class={sectionClass}>
+          <div class="flex items-start gap-3 mb-4">
+            <span class="text-3xl text-primary mt-0.5"><LuFileText /></span>
+            <h2 class={headingClass}>{chapters[2].heading}</h2>
+          </div>
+          <p class="mb-7 max-w-2xl text-lg leading-relaxed text-base-content/75">
+            First-author work from the PhD — Bayesian topic models and emotion
+            modelling on patient-reported experiences, including extracting early
+            COVID-19 symptom signals from social media before they were widely
+            recognised clinically.
+          </p>
+          {publications.map((details) => <CardPub details={details} />)}
+          <p class="mt-5 text-sm italic text-base-content/55">
+            *okay, actually lewis paid. thanks <a href="https://lewismath.github.io/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 hover:text-base-content/80 transition-colors">lewis</a>. also they're open source —
+            you don't have to pay anything.
+          </p>
+        </section>
+
+        {/* some cool things */}
+        <section id="projects" class={sectionClass}>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-3xl text-primary"><LuLightbulb /></span>
+            <h2 class={headingClass}>{chapters[3].heading}</h2>
+          </div>
+          <div class="space-y-6">
+            {
+              featured.map((p) => (
+                <article class="rounded-2xl bg-base-200/55 ring-1 ring-base-300/50 p-6 sm:p-8 space-y-3">
+                  <span class="text-xs font-medium tracking-wide uppercase text-primary">
+                    {p.meta}
+                  </span>
+                  <h3 class="font-slab text-2xl font-semibold text-base-content">
+                    {p.title}
+                  </h3>
+                  {p.body.map((para) => (
+                    <p class="text-base-content/75 leading-relaxed">{para}</p>
+                  ))}
+                  <p class="text-sm text-base-content/70 pt-1">
+                    <span class="font-medium text-base-content">Stack:</span>{" "}
+                    {p.stack}
+                  </p>
+                  {p.note && p.note.href && (
+                    <p class="text-sm italic text-base-content/70 pt-1">
+                      {p.note.pre}
+                      <a
+                        href={p.note.href}
+                        target={p.note.external ? "_blank" : undefined}
+                        rel={p.note.external ? "noopener noreferrer" : undefined}
+                        class="text-primary underline underline-offset-2 decoration-primary/40 hover:decoration-primary transition-colors"
+                      >
+                        {p.note.link}
+                      </a>
+                      {p.note.post}
+                    </p>
+                  )}
+                </article>
+              ))
+            }
+          </div>
+        </section>
+
+        {/* the toolkit */}
+        <section id="toolkit" class={sectionClass}>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="text-3xl text-primary"><LuWrench /></span>
+            <h2 class={headingClass}>{chapters[4].heading}</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 class="font-slab text-xl font-semibold text-base-content mb-5">
+                tech stack
+              </h3>
+              <div class="flex gap-2.5 flex-wrap">
+                {tools.map((item) => <Tag tagName={item} />)}
+              </div>
+            </div>
+            <div>
+              <h3 class="font-slab text-xl font-semibold text-base-content mb-5">
+                domains
+              </h3>
+              <div class="flex gap-2.5 flex-wrap">
+                {knowledges[0].data.skill.map((item) => <Tag tagName={item} />)}
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <SiteFooter />
+</Layout>

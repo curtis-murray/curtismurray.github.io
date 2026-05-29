@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import Photography from "../components/Photography";
+import SiteFooter from "../components/SiteFooter.astro";
 import photos from "../data/photography.json";
 ---
 
@@ -9,4 +10,6 @@ import photos from "../data/photography.json";
   title="Photography — Curtis Murray · AI Engineer · Agentic AI · LLMs · RAG · MCP"
 >
   <Photography photos={photos} client:only="react" />
+
+  <SiteFooter />
 </Layout>

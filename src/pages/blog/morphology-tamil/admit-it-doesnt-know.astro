@@ -1,0 +1,717 @@
+---
+import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
+---
+
+<BlogPostLayout
+  title="Teaching a model to admit it doesn't know — Spoken Tamil morphology, Part 3 · Curtis Murray"
+  description="Part 3 of 4: the model proposes, a curated knowledge graph disposes. A ReAct loop, typed tools, and a fully traced run — including the two times the graph caught the model being confidently wrong."
+  prev={{
+    href: "/blog/morphology-tamil/where-llms-go-wrong",
+    dir: "← Part 2",
+    ttl: "Where a language model goes wrong",
+  }}
+  next={{
+    href: "/blog/morphology-tamil/what-it-takes",
+    dir: "Part 4 →",
+    ttl: "The recipe: what it takes to make a model admit it doesn't know",
+  }}
+>
+  <div class="wrap">
+    <header>
+      <div class="kicker">
+        Creating the first morphological analyser for Spoken Tamil · Part 3 of 4
+      </div>
+      <h1>
+        Teaching a model to admit it doesn't know — by forcing it to find evidence
+      </h1>
+      <p class="standfirst">
+        The architecture that makes an ill-specified problem tractable: let the model
+        break a Spoken Tamil word into parts <em>without</em> inventing parts that don't
+        exist. It proposes; a knowledge graph disposes. A fully traced run is the story
+        within.
+      </p>
+      <div class="byline">
+        Curtis Murray · worked example: <span class="ta">படிச்சிட்டேன்</span> · every
+        Tamil &amp; English word below is a live card
+      </div>
+    </header>
+
+    <p class="lede">
+      The series so far. <a href="/blog/morphology-tamil/what-is-morphological-analysis"
+        >Part&nbsp;1</a
+      >: morphological analysis means breaking a word into its smallest meaningful pieces
+      — <em>learners</em> → <code>learn‑er‑s</code>, and <span class="ta"
+        >படிச்சிட்டேன்</span
+      > → <em>study + participle + completive + "I"</em>. <a
+        href="/blog/morphology-tamil/where-llms-go-wrong">Part&nbsp;2</a
+      >: hand that word to a language model and it invents, relabels and drifts — fluently
+      and invisibly — because for Spoken Tamil there is no ground truth in its training
+      data to recover, only plausible fictions to generate. This post is the fix.
+    </p>
+
+    <div class="cardslot" data-w="படிச்சிட்டேன்"></div>
+
+    <h2><span class="num">01</span>The fix: the model proposes, the graph disposes</h2>
+
+    <p>
+      So stop making the model the source of truth about what exists. The architecture
+      is <strong>neuro-symbolic</strong> — split the system in two:
+    </p>
+
+    <p>
+      <strong>The symbolic half</strong> is a curated Neo4j knowledge graph encoding
+      Schiffman's <em>Reference Grammar of Spoken Tamil</em>: every morpheme, every grammatical
+      construction, every semantic concept, every rule that is actually attested. It
+      is small, hand-verified, and authoritative. It cannot generate anything — it can
+      only confirm or deny.
+    </p>
+
+    <p>
+      <strong>The neural half</strong> is the LLM. It is good at exactly what the graph
+      can't do: looking at an unfamiliar surface string and <em>proposing</em> a plausible
+      decomposition, and writing fluent learner-facing explanations.
+    </p>
+
+    <p>
+      The bargain: the LLM proposes; the graph disposes. Every hypothesis is checked
+      against the graph. A rejection isn't a dead end — it comes back as <em
+        >structured feedback</em
+      > ("that morpheme ID doesn't exist; here are the ones that do, with their canonical
+      forms"), which the model uses to revise. It loops until everything it wants to
+      write is grounded in a node that actually exists. The model is allowed to be creative
+      about <em>hypotheses</em> and never allowed to be creative about <em>facts</em>.
+    </p>
+
+    <p>
+      The two halves never touch directly. They're connected through a single <strong
+        >MCP server</strong
+      > exposing a fixed set of typed tools — the only path to the graph — so the model
+      can't run raw queries or invent structure; it proposes, the graph adjudicates.
+      Analysis runs as a <strong>ReAct loop</strong>: at each step the model reasons
+      about the current state, calls one tool, and observes structured feedback — match
+      scores, construction coverage, position-by-position diffs against the closest existing
+      word — then refines before the next step, repeating until the analysis is grounded
+      enough to commit as a new node. You can watch exactly this happen in the traced
+      run below.
+    </p>
+
+    <figure>
+      <table class="recipe">
+        <thead>
+          <tr>
+            <th style="width:172px">Step</th>
+            <th>What the system does</th>
+            <th style="width:300px">The transferable principle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="r-propose">
+            <td class="step">① Propose<span class="tool">LLM · creative</span></td>
+            <td>Hypothesise a segmentation and gloss for the input word.</td>
+            <td>
+              Define a <b>committable target</b>; give the model <b>retrieval</b> to
+              find what's real.
+            </td>
+          </tr>
+          <tr class="r-ground">
+            <td class="step">② Ground<span class="tool">MCP typed tools</span></td>
+            <td>
+              Check every claim against the graph — match scores, construction coverage,
+              position-by-position diffs.
+            </td>
+            <td>
+              Ground in a <b>source of truth</b> it can't override; <b>constrain</b> the
+              action space to typed tools.
+            </td>
+          </tr>
+          <tr class="r-commit">
+            <td class="step">③ Commit<span class="tool">create_wordform</span></td>
+            <td>Write the new, fully-grounded node back to the graph.</td>
+            <td><b>Evaluate the tool calls</b>, not just the final answer.</td>
+          </tr>
+          <tr class="r-loop">
+            <td class="step">↩ Not grounded<span class="tool">revise ①</span></td>
+            <td>
+              The rejection returns as structured feedback — canonical forms, the legal
+              allomorph set, the exact slot that failed — and the model revises its hypothesis.
+            </td>
+            <td><b>Make failure useful</b> — structured feedback, never a dead end.</td>
+          </tr>
+          <tr class="r-iter">
+            <td class="step">↻ Repeat<span class="tool">outer loop</span></td>
+            <td>Run real words, watch where it drifts, tighten the tools and prompts.</td>
+            <td><b>Test and iterate</b> until it converges.</td>
+          </tr>
+        </tbody>
+      </table>
+      <figcaption>
+        The analyser as a ReAct loop: the LLM proposes, deterministic tools ground every
+        claim against the graph, rejections come back as structured feedback, and only
+        a fully-grounded analysis is committed. The right-hand column is the transferable
+        part — the same spine holds in any domain where the ground truth is small, specialised,
+        and largely absent from training data.
+      </figcaption>
+    </figure>
+
+    <h2><span class="num">02</span>The unit of truth: the triad</h2>
+
+    <p>
+      You might expect the graph to just say "morpheme <span class="ta">(வி)டு</span>
+      means completive aspect". It deliberately doesn't, and the reason is the most important
+      modelling decision in the system — and a clue to where the expertise in this setup
+      actually lives: not in the agent at run time, but in choices like this one, made by a
+      human and committed to the graph's shape long before the agent runs.
+    </p>
+
+    <p>
+      <strong>Morphemes are polysemous.</strong> A morpheme's meaning is not intrinsic
+      — it depends on the construction it appears in. The classic Tamil example: the
+      clitic <span class="ta">உம்</span> means "also / too" in one construction (<span
+        class="ta">கோட்டையும்</span
+      > "the fort <em>too</em>") and "even if" in another (<span class="ta"
+        >வந்தாலும்</span
+      > "<em>even if</em> X comes"). If you attach meaning directly to the morpheme,
+      one of those has to be wrong. So the graph never draws a <code>Morpheme → meaning</code>
+      edge. Meaning always flows through a <strong>Construction</strong> — a multi-morpheme
+      pattern, in the Construction Grammar sense, that is the real locus of meaning.
+      The load-bearing structure is a triple:
+    </p>
+
+    <figure>
+      <div class="kgfig">
+        <div class="kg-hub2">
+          <svg class="kg-wires" aria-hidden="true"></svg>
+
+          <!-- hub · ConstructionCard · primary -->
+          <div class="kg-hubcell">
+            <div class="kg-card kg--construction">
+              <div class="kg-head">
+                <span class="kg-badge">Construction</span>
+                <div class="kg-id">constr_marked_completion</div>
+                <div class="kg-sub">pattern: VERB-AVP + COMPL-TENSE-PNG</div>
+              </div>
+              <div class="kg-body">
+                <p class="kg-mean">"Action definitely completed"</p>
+                <div class="kg-ex">
+                  <span class="ta">போய்ட்டேன்</span>
+                  <span class="tr">"I definitely went"</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- spokes -->
+          <div class="kg-spokecol">
+            <div class="kg-spoke" data-rel="EXPRESSES">
+              <!-- SemanticConceptCard · neutral -->
+              <div class="kg-card kg--concept">
+                <div class="kg-head">
+                  <span class="kg-badge">Semantic Concept</span>
+                  <div class="kg-id">sem_completive_aspect</div>
+                </div>
+                <div class="kg-body">
+                  <p class="kg-mean">
+                    "Action viewed as completed, definite, brought to conclusion"
+                  </p>
+                  <p class="kg-sub">props: [certainty, completion]</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="kg-spoke" data-rel="USES_MORPHEME">
+              <!-- MorphemeCard · secondary -->
+              <div class="kg-card kg--morpheme">
+                <div class="kg-head">
+                  <span class="kg-badge">Morpheme</span>
+                  <div class="kg-form">(வி)டு</div>
+                  <div class="kg-sub">morph_vidu</div>
+                </div>
+                <div class="kg-body">
+                  <p class="kg-mean">gloss COMPL · aspect marker</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="kg-spoke" data-rel="FOLLOWS_RULE" data-optional>
+              <!-- RuleCard · accent -->
+              <div class="kg-card kg--rule">
+                <div class="kg-head">
+                  <span class="kg-badge">Rule</span>
+                  <div class="kg-id">rule_aspectual_verb_syntax</div>
+                </div>
+                <div class="kg-body">
+                  <p class="kg-mean">
+                    "Aspectual verbs attach to the AVP of the main verb and carry tense
+                    / PNG marking"
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p class="kg-foot">
+          The same morph_vidu also participates in constr_aspectual_vidu — one morpheme,
+          multiple constructions. Meaning is read off the construction, never the morpheme
+          alone.
+        </p>
+        <p class="kg-src">— live subgraph, explore_nodes(constr_marked_completion, morph_vidu)</p>
+      </div>
+      <figcaption>
+        The completive-aspect triad, pulled live from the graph for this walkthrough.
+        This is the actual closure the agent reasons over for the <span class="ta"
+          >(வி)டு</span
+        > bead of <span class="ta">படிச்சிட்டேன்</span>.
+      </figcaption>
+    </figure>
+
+    <p>
+      Read it as a sentence: <em>the construction</em> <code>constr_marked_completion</code>
+      <em>uses the morpheme</em> <code>morph_vidu</code>, <em>expresses the concept</em>
+      <code>sem_completive_aspect</code>, <em>and follows the rule</em> that aspectual
+      verbs attach to the main verb's AVP. That whole triad is the unit of truth. When
+      the agent claims "this <span class="ta">(வி)டு</span> here means completive", it
+      is not asserting a fact about a morpheme — it is asserting that this specific triad
+      exists. The graph can check that in one query. <strong
+        >That is what makes unsupported structure catchable instead of merely regrettable.</strong
+      >
+    </p>
+  </div><!-- /wrap -->
+
+  <div class="wide">
+    <hr class="sec" />
+
+    <h2 id="traced-run" style="text-align:center">
+      <span class="num">03</span>Seeing it work — one word, traced end to end
+    </h2>
+    <p style="max-width:720px;margin:0 auto 22px;text-align:center;color:var(--dim)">
+      Everything above is the architecture. This is the story within it: the same word,
+      <span class="ta">படிச்சிட்டேன்</span>, but now watch the loop actually run — including
+      the two moments it caught itself being confidently wrong.
+    </p>
+
+    <div style="max-width:760px;margin:0 auto">
+      <p>
+        The agent never touches the graph directly. It cannot run a database query or
+        hand-write a file. It gets a handful of <strong>typed tools</strong> over the
+        Model Context Protocol — schema-validated requests, so a malformed call fails
+        harmlessly instead of corrupting a curated graph. Validation, normalisation
+        and atomic writes live in that tool layer, enforced once in code rather than
+        re-derived from a prompt each session. The tools answer in <strong
+          >prose with embedded structured fields</strong
+        >, never raw JSON — that forces the model to weigh the evidence and judge, rather
+        than branch on a magic number. The agent decides when it is grounded; the server
+        only ever surfaces evidence.
+      </p>
+
+      <p>
+        The control loop is <strong>ReAct</strong> — <em>Reason, Act, Observe</em>, repeat
+        — until every piece it wants to write resolves to a node that already exists:
+      </p>
+
+      <div class="react" style="justify-content:center">
+        <span class="s">Reason: form / revise a hypothesis</span><span class="a">→</span>
+        <span class="s">Act: one tool call</span><span class="a">→</span>
+        <span class="s">Observe: structured feedback</span><span class="a">↺</span>
+        <span class="s">…until grounded</span><span class="a">→</span>
+        <span class="s">Act: atomic write</span>
+      </div>
+
+      <p>
+        Four tools carry the run. <span class="nm" style="font-family:var(--mono);color:var(--accent)"
+          >word_lookup</span
+        > finds surface-similar neighbours — the right-anchored match <span class="ta"
+          >போய்ட்டேன்</span
+        > shares the ending <span class="ta">ட்டேன்</span>, evidence for the completive-past-"I"
+        tail before any analysis. <span class="nm" style="font-family:var(--mono);color:var(--accent)"
+          >validate_hypothesis</span
+        > scores a whole proposed segmentation against the graph and reports exactly which
+        segments fail to resolve. <span class="nm" style="font-family:var(--mono);color:var(--accent)"
+          >search_*</span
+        > reaches the graph by surface form, by gloss, or by meaning — because you arrive
+        knowing different things. <span class="nm" style="font-family:var(--mono);color:var(--accent)"
+          >create_wordform</span
+        > is the only writer: it checks ~12 invariants before the write and then re-queries
+        the node it just wrote to confirm it landed.
+      </p>
+    </div>
+
+    <div class="leg" style="justify-content:center">
+      <span><i class="dot" style="background:var(--good)"></i> accepted</span>
+      <span
+        ><i class="dot" style="background:var(--bad)"></i> rejected by the graph — forced
+        a refine</span
+      >
+      <span><i class="dot" style="background:var(--accent)"></i> read / discovery</span>
+    </div>
+
+    <table class="data">
+      <thead>
+        <tr>
+          <th class="m">Tool</th>
+          <th>What it asked the graph · ReAct step</th>
+          <th class="m">Recorded outcome</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="m">word_lookup</td>
+          <td>Does <span class="ta">படிச்சிட்டேன்</span> exist? Near-matches? <em>(step 0)</em></td>
+          <td class="m">exact: false · 7 LCS neighbours</td>
+          <td><span class="pill info">new word</span></td>
+        </tr>
+        <tr>
+          <td class="m">validate_hypothesis</td>
+          <td>Score the proposed root·participle·completive·past·"I" split <em>(step 2)</em></td>
+          <td class="m">constr_marked_completion · coverage 50% · all segments resolve · jaccard 0.40</td>
+          <td><span class="pill ok">scored</span></td>
+        </tr>
+        <tr>
+          <td class="m">explore_nodes · search_general · search_construction</td>
+          <td>
+            Confirm the COMPL triad; inspect <code>word_padi</code>; check parallels
+            <code>word_kandupidicchittu</code>, <code>word_veesiduven</code>, <code
+              >constr_class_vii_past</code
+            > <em>(steps 3 &amp; 5)</em>
+          </td>
+          <td class="m">triads confirmed; AVP+COMPL construction = 1 match</td>
+          <td><span class="pill info">grounding</span></td>
+        </tr>
+        <tr>
+          <td class="m">search_matching_wordforms</td>
+          <td>Find a derivational parent <em>(step 4)</em></td>
+          <td class="m">best_match: <b>null</b> · 0 alternatives</td>
+          <td><span class="pill info">branch is new</span></td>
+        </tr>
+        <tr>
+          <td class="m">search_wordform_tree</td>
+          <td>Walk descendants of root <code>word_padi</code></td>
+          <td class="m">2 nodes</td>
+          <td><span class="pill info">read</span></td>
+        </tr>
+        <tr>
+          <td class="m">explore_nodes</td>
+          <td>Verify the pattern against <code>word_pannikitteen</code></td>
+          <td class="m">18 nodes</td>
+          <td><span class="pill info">read</span></td>
+        </tr>
+        <tr style="background:oklch(var(--er) / 0.08)">
+          <td class="m">create_wordform</td>
+          <td><code>word_padichchu</code> — first write attempt <em>(step 7)</em></td>
+          <td class="m" style="color:var(--bad)">REJECTED — gloss prefix mismatch</td>
+          <td><span class="pill rej">refine ↻</span></td>
+        </tr>
+        <tr>
+          <td class="m">create_wordform</td>
+          <td><code>word_padichchu</code> — corrected gloss</td>
+          <td class="m">post_write_verified: true</td>
+          <td><span class="pill ok">committed</span></td>
+        </tr>
+        <tr>
+          <td class="m">create_wordform</td>
+          <td><code>word_padichchittu</code> &nbsp;(+ COMPL)</td>
+          <td class="m">post_write_verified: true</td>
+          <td><span class="pill ok">committed</span></td>
+        </tr>
+        <tr style="background:oklch(var(--er) / 0.08)">
+          <td class="m">create_wordform</td>
+          <td><code>word_padichchitt</code> — first write attempt</td>
+          <td class="m" style="color:var(--bad)">REJECTED — underlying form ≠ morpheme</td>
+          <td><span class="pill rej">refine ↻</span></td>
+        </tr>
+        <tr>
+          <td class="m">create_wordform</td>
+          <td><code>word_padichchitt</code> — corrected notation</td>
+          <td class="m">post_write_verified: true</td>
+          <td><span class="pill ok">committed</span></td>
+        </tr>
+        <tr>
+          <td class="m">create_wordform</td>
+          <td><code>word_padichchitten</code> — target leaf (+ 1SG)</td>
+          <td class="m">post_write_verified: true</td>
+          <td><span class="pill ok">committed</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p style="max-width:760px;margin:22px auto 0;color:var(--dim);text-align:center;font-size:14.5px">
+      Note the shape: a wide read-only discovery phase grounding every morpheme and
+      the triad, then a careful write phase. And <code>search_matching_wordforms</code>
+      returned <em>null</em> — the system reported it did not already know this branch
+      rather than guessing a parent. Knowing what it doesn't know is the whole point.
+    </p>
+
+    <hr class="sec" />
+
+    <h3 style="text-align:center;font-size:20px;margin:0 0 6px">
+      Two times the graph caught the model
+    </h3>
+    <p style="max-width:680px;margin:0 auto 24px;text-align:center;color:var(--dim)">
+      Its linguistic reasoning was strong; it still made two of the exact errors from
+      Part&nbsp;2. Neither reached the graph. The text below is verbatim from the rejection.
+    </p>
+
+    <div style="max-width:820px;margin:0 auto">
+      <div class="catch">
+        <h4>
+          <span>Catch 1 — the gloss drifted (failure mode 3)</span><small
+            >create_wordform · word_padichchu</small
+          >
+        </h4>
+        <div class="b">
+          <p style="max-width:none">
+            A child word must extend its parent by one morpheme and inherit the parent's
+            gloss prefix exactly — that's what keeps the derivation forest coherent.
+            The model glossed the root <code>study</code>; its parent <code
+              >word_padi</code
+            > is glossed <code>read/study</code>. A silent drift no human would catch
+            at scale. The write was refused before it happened:
+          </p>
+          <pre><span class="x">❌ Gloss prefix mismatch:</span>
+  Parent gloss: ['read/study']
+  Child prefix: ['study']
+  First 1 elements must match parent exactly.</pre>
+          <p class="fix" style="max-width:none">
+            <b>Refined and re-submitted</b> with the gloss aligned to the parent → committed,
+            post-write verified.
+          </p>
+        </div>
+      </div>
+
+      <div class="catch">
+        <h4>
+          <span>Catch 2 — an illegal allomorph (failure mode 2)</span><small
+            >create_wordform · word_padichchitt</small
+          >
+        </h4>
+        <div class="b">
+          <p style="max-width:none">
+            For the past-tense piece the model wrote the underlying form <span class="ta"
+              >ட்ட்</span
+            > — with a trailing <em>pulli</em> (the vowel-killing dot). The graph knows
+            the canonical form and the legal allomorphs, and that this notation is none
+            of them. The rejection didn't merely say "wrong" — it returned the canonical
+            form <em>and the full allomorph set</em>, so the correction was deterministic,
+            not a guess:
+          </p>
+          <pre><span class="x">❌ Underlying form '<span class="t">ட்ட்</span>' does not match morph_past_strong_tt.</span>
+
+<span class="c">✓ Canonical form: <span class="t">த்த</span>
+✓ Acceptable variants: ['<span class="t">ச்ச</span>', '<span class="t">ட்ட</span>', '<span class="t">த்த</span>']
+✓ Allomorphs: ['<span class="t">ச்ச</span>', '<span class="t">ட்ட</span>']</span>
+
+💡 Suggestion: Use exact canonical form: <span class="t">த்த</span></pre>
+          <p class="fix" style="max-width:none">
+            <b>Refined and re-submitted</b> with <span class="ta">ட்ட</span> (the legal
+            retroflex allomorph, no trailing pulli) → committed, post-write verified.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <p style="max-width:720px;margin:26px auto 0;text-align:center;color:var(--ink-soft)">
+      Two of the three failure modes from Part&nbsp;2, happening for real — and both
+      intercepted with a structured, machine-actionable correction. Not "the LLM is
+      usually right" — <em
+        >the LLM is checked, every time, against something that cannot hallucinate.</em
+      >
+    </p>
+
+    <p style="max-width:760px;margin:22px auto 0;text-align:center;color:var(--dim);font-size:14.5px">
+      The end state: the completive branch of <span class="ta">படி</span> now exists
+      where there was nothing — four nodes written in dependency order, each re-queried
+      and verified after its write.
+    </p>
+    <div class="react" style="justify-content:center">
+      <span class="s"
+        >word_padi <small style="color:var(--dim)">root, pre-existing</small></span
+      ><span class="a">→</span>
+      <span class="s">word_padichchu</span><span class="a">→</span>
+      <span class="s">word_padichchittu</span><span class="a">→</span>
+      <span class="s">word_padichchitt</span><span class="a">→</span>
+      <span class="s" style="border-color:var(--good)"
+        >word_padichchitten <small style="color:var(--good)">target</small></span
+      >
+    </div>
+
+    <hr class="sec" />
+
+    <h2 style="text-align:center"><span class="num">04</span>What this shows</h2>
+    <div class="takeaway" style="max-width:820px;margin:16px auto 0">
+      <ul>
+        <li>
+          <b>The neuro-symbolic guarantee is narrow but real:</b> unsupported structure
+          cannot silently enter the graph. Two LLM errors — a drifted gloss and a fine
+          morphophonological one — were caught by the symbolic layer and never reached the
+          graph. The exact rejection text is in the log;
+          the run replays from <code>tool-calls.jsonl</code>.
+        </li>
+        <li>
+          <b>Rejections are structured, so self-correction is cheap.</b> The graph returned
+          the canonical form and the legal allomorph set, not just "invalid" — one extra
+          call and the model is right. This is the same constrain-to-verified-entities
+          pattern that beat direct LLM generation in clinical entity linking — different
+          domain, identical spine.
+        </li>
+        <li>
+          <b>The system reports what it doesn't know.</b> <code
+            >search_matching_wordforms</code
+          > returned null; the agent built a fresh branch instead of fabricating a parent.
+          A model that says "I don't have this" is worth more than one that always answers.
+        </li>
+        <li>
+          <b>Observability is built in.</b> One structured line per tool call, keyed
+          by session. Replaying a session reconstructs any run; aggregating by the outcome
+          field measures behavioural drift — no external eval harness required.
+        </li>
+        <li>
+          <b>Honest limitation.</b> This proves <em>graph consistency</em>, not <em
+            >linguistic correctness</em
+          >. Ground truth is Schiffman plus expert judgement; there is no held-out labelled
+          accuracy set yet — and the surface segmentations in the cards above are my
+          best analysis, not gold data. Building that set — sampled words, expert-annotated
+          segmentations, segment- and gloss-level accuracy — is the next milestone, and
+          I'd rather say so than imply a metric I don't have.
+        </li>
+      </ul>
+    </div>
+
+    <footer>
+      <span class="src">source: logs/tool-calls.jsonl · triad: explore_nodes(constr_marked_completion, morph_vidu)</span>
+      <span>Tamil Morphology MCP · neuro-symbolic agent system · Curtis Murray</span>
+    </footer>
+  </div><!-- /wide -->
+
+  <style is:global>
+    /* ── post-3-only components — colours wired to the theme vars from blog.css ── */
+
+    /* KG relation-card figure: ported from KGRelationCard / Badge / *Card.jsx */
+    .kgfig{font-family:var(--body);max-width:1000px;margin:0 auto}
+    .kg-hub2{position:relative;display:flex;align-items:center;justify-content:center;gap:152px}
+    .kg-wires{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:0;color:oklch(var(--bc) / 0.4)}
+    .kg-hubcell{display:flex;position:relative;z-index:1}
+    .kg-hubcell .kg-card{max-width:288px}
+    .kg-spokecol{display:flex;flex-direction:column;gap:18px;flex:1;max-width:520px;position:relative;z-index:1}
+    .kg-spoke{display:flex;align-items:center}
+    .kg-spoke .kg-card{flex:1;min-width:0}
+    .kg-card{
+      border-radius:8px;padding:20px 22px;min-width:0;
+      box-shadow:0 10px 15px -3px rgba(0,0,0,.18),0 4px 6px -4px rgba(0,0,0,.14)}
+    .kg-card .kg-head{display:flex;flex-direction:column;gap:8px}
+    .kg-card .kg-badge{
+      align-self:center;display:inline-flex;align-items:center;
+      font-weight:500;font-size:13px;line-height:1.3;
+      padding:2px 10px;border-radius:9999px;color:var(--ink)}
+    .kg-card .kg-id{font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink)}
+    .kg-card .kg-form{font-family:var(--tamil);font-size:20px;color:var(--ink)}
+    .kg-card .kg-sub{font-family:var(--mono);font-size:12px;color:var(--dim)}
+    .kg-card .kg-body{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+    .kg-card .kg-mean{font-size:13px;color:var(--dim);margin:0}
+    .kg-card .kg-ex{
+      display:flex;flex-direction:column;gap:4px;
+      padding:8px 10px;border-radius:6px;background:oklch(var(--bc) / 0.1);font-size:12px}
+    .kg-card .kg-ex .ta{font-family:var(--tamil);color:var(--ink)}
+    .kg-card .kg-ex .tr{font-style:italic;color:var(--ink)}
+    /* theme tints — getColoredClasses()/Badge intensities, on the theme palette */
+    .kg--construction{background:oklch(var(--p) / 0.30)}
+    .kg--construction .kg-badge{background:oklch(var(--p) / 0.70)}
+    .kg--morpheme{background:oklch(var(--wa) / 0.30)}
+    .kg--morpheme .kg-badge{background:oklch(var(--wa) / 0.55)}
+    .kg--rule{background:oklch(var(--a) / 0.22)}
+    .kg--rule .kg-badge{background:oklch(var(--a) / 0.45)}
+    .kg--concept{background:oklch(var(--su) / 0.20)}
+    .kg--concept .kg-badge{background:oklch(var(--su) / 0.42)}
+    /* connectors: SVG wires + relation chips, both positioned by the script below */
+    .kg-rel{position:absolute;transform:translate(-50%,-50%);z-index:2;
+      font-family:var(--mono);font-size:10.5px;letter-spacing:.6px;color:var(--dim);
+      background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px 8px;white-space:nowrap}
+    .kg-rel--opt{border-style:dashed;background:var(--panel2)}
+    .kg-foot{text-align:center;color:var(--dim);font-size:12.5px;max-width:680px;margin:30px auto 0;line-height:1.5}
+    .kg-src{text-align:center;color:var(--dim);font-size:11px;font-family:var(--mono);margin:8px 0 0}
+    @media (max-width:760px){
+      .kg-hub2{flex-direction:column;gap:16px}
+      .kg-hubcell .kg-card,.kg-spokecol{max-width:100%}
+      .kg-spoke{flex-direction:column;gap:10px}
+      .kg-wires,.kg-rel{display:none}
+    }
+
+    /* transferable-pattern table: the analyser loop as steps + the principle each generalises */
+    .recipe{width:100%;max-width:880px;margin:0 auto;border-collapse:collapse;
+      font-family:var(--body);font-size:13.5px;
+      background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+    .recipe thead th{font:700 10px/1.3 var(--mono);letter-spacing:.13em;text-transform:uppercase;
+      color:var(--dim);text-align:left;padding:14px 18px;background:var(--panel2);
+      border-bottom:1.5px solid var(--line)}
+    .recipe td{padding:15px 18px;vertical-align:top;line-height:1.55;color:var(--ink-soft);
+      border-bottom:1px solid oklch(var(--bc) / 0.12)}
+    .recipe tbody tr:last-child td{border-bottom:0}
+    .recipe td:first-child{border-left:3px solid transparent}
+    .recipe .r-propose td:first-child{border-left-color:var(--accent)}
+    .recipe .r-ground  td:first-child{border-left-color:var(--good)}
+    .recipe .r-commit  td:first-child{border-left-color:var(--warn)}
+    .recipe .r-loop    td:first-child{border-left-color:var(--purple)}
+    .recipe .r-iter    td:first-child{border-left-color:var(--dim)}
+    .recipe .step{white-space:nowrap;font-weight:680;color:var(--ink);font-size:13.5px}
+    .recipe .step .tool{display:block;font:600 11px/1.4 var(--mono);color:var(--dim);
+      margin-top:4px;white-space:nowrap}
+    .recipe td b{color:var(--ink);font-weight:680}
+    @media (max-width:640px){
+      .recipe,.recipe thead,.recipe tbody,.recipe tr,.recipe td{display:block;width:auto}
+      .recipe thead{display:none}
+      .recipe tr{border-bottom:1px solid var(--line);padding:6px 0}
+      .recipe td{border-bottom:0;padding:6px 16px}
+      .recipe td:first-child{border-left:3px solid transparent;padding-top:14px}
+    }
+  </style>
+
+  <script is:inline>
+    /* Draws the hub→spoke wires for the triad figure: all three originate at the
+       Construction card's right edge and fan out to each related card. The
+       FOLLOWS_RULE wire is dashed. Stroke/fill use currentColor so the wires
+       follow the theme (.kg-wires sets color from a DaisyUI token). */
+    (function () {
+      var NS = "http://www.w3.org/2000/svg";
+      function el(n, a) { var e = document.createElementNS(NS, n); for (var k in a) e.setAttribute(k, a[k]); return e; }
+      function draw() {
+        var wrap = document.querySelector(".kg-hub2"); if (!wrap) return;
+        var svg = wrap.querySelector(".kg-wires");
+        var hub = wrap.querySelector(".kg-hubcell .kg-card");
+        var spokes = [].slice.call(wrap.querySelectorAll(".kg-spoke"));
+        if (!svg || !hub || !spokes.length) return;
+        var wr = wrap.getBoundingClientRect(); if (wr.width < 2) return;
+        while (svg.firstChild) svg.removeChild(svg.firstChild);
+        [].slice.call(wrap.querySelectorAll(".kg-rel")).forEach(function (c) { c.parentNode.removeChild(c); });
+        svg.setAttribute("viewBox", "0 0 " + wr.width + " " + wr.height);
+        var defs = el("defs", {});
+        var mk = el("marker", { id: "kgar", viewBox: "0 0 10 10", refX: "8", refY: "5", markerWidth: "6", markerHeight: "6", orient: "auto" });
+        mk.appendChild(el("path", { d: "M0 0L10 5L0 10z", fill: "currentColor" }));
+        defs.appendChild(mk); svg.appendChild(defs);
+        var hb = hub.getBoundingClientRect();
+        var x1 = hb.right - wr.left, y1 = hb.top - wr.top + hb.height / 2;
+        spokes.forEach(function (sp) {
+          var card = sp.querySelector(".kg-card"); if (!card) return;
+          var cb = card.getBoundingClientRect();
+          var x2 = cb.left - wr.left, y2 = cb.top - wr.top + cb.height / 2;
+          var opt = sp.hasAttribute("data-optional");
+          var dx = Math.max(40, (x2 - x1) * 0.45);
+          var d = "M" + x1 + " " + y1 + " C" + (x1 + dx) + " " + y1 + " " + (x2 - dx) + " " + y2 + " " + x2 + " " + y2;
+          svg.appendChild(el("path", { d: d, fill: "none", stroke: "currentColor", "stroke-width": "2",
+            "stroke-dasharray": opt ? "5 4" : "none", "marker-end": "url(#kgar)" }));
+          var chip = document.createElement("span");
+          chip.className = "kg-rel" + (opt ? " kg-rel--opt" : "");
+          chip.textContent = sp.getAttribute("data-rel") || "";
+          chip.style.left = ((x1 + x2) / 2) + "px";
+          chip.style.top = ((y1 + y2) / 2) + "px";
+          wrap.appendChild(chip);
+        });
+      }
+      function schedule() { clearTimeout(window.__kgw); window.__kgw = setTimeout(draw, 120); }
+      if (document.readyState !== "loading") schedule(); else window.addEventListener("DOMContentLoaded", schedule);
+      window.addEventListener("load", schedule);
+      window.addEventListener("resize", schedule);
+      if (window.ResizeObserver) { var ro = new ResizeObserver(schedule); var f = document.querySelector(".kgfig"); if (f) ro.observe(f); }
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+    })();
+  </script>
+</BlogPostLayout>

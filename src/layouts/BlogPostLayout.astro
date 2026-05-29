@@ -1,0 +1,58 @@
+---
+// Shared layout for the morphology blog series. Renders the article inside the
+// site's interior-page shell (translucent reading panel over the fixed mountain
+// backdrop + StoryNav + Lenis + SiteFooter — all from Layout's non-story
+// branch), then the series nav, then the interactive engine.
+//
+// The engine (audio-data → morphology-data → morphology-engine) is loaded
+// is:inline, in this exact order, AFTER the slotted article: it's an IIFE that
+// scans `.wrap`/`.wide` and renders `.cardslot` cards at run time, so the
+// content must already be in the DOM. is:inline keeps load order and the
+// window.* globals intact (no Astro bundling). Assets are served from
+// /public/blog/morphology-tamil/.
+import Layout from "./Layout.astro";
+import "../styles/blog/blog.css";
+import "../styles/blog/morphology-cards.css";
+
+interface NavLink {
+  href: string;
+  dir: string;
+  ttl: string;
+}
+interface Props {
+  title: string;
+  description?: string;
+  prev?: NavLink;
+  next?: NavLink;
+}
+const { title, description, prev, next } = Astro.props;
+const base = "/blog/morphology-tamil";
+---
+
+<Layout title={title} description={description}>
+  <slot />
+
+  <nav class="series-nav">
+    {
+      prev && (
+        <a class="prev" href={prev.href}>
+          <span class="dir">{prev.dir}</span>
+          <span class="ttl">{prev.ttl}</span>
+        </a>
+      )
+    }
+    <a class="hub" href="/blog/">Series home</a>
+    {
+      next && (
+        <a class="next" href={next.href}>
+          <span class="dir">{next.dir}</span>
+          <span class="ttl">{next.ttl}</span>
+        </a>
+      )
+    }
+  </nav>
+
+  <script is:inline src={`${base}/audio-data.js`}></script>
+  <script is:inline src={`${base}/shared/morphology-data.js`}></script>
+  <script is:inline src={`${base}/shared/morphology-engine.js`}></script>
+</Layout>

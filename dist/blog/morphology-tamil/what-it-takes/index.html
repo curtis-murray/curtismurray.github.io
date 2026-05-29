@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>What it takes to make a model admit it doesn't know — Spoken Tamil morphology, Part 4 · Curtis Murray</title>
+
+
+
+<link rel="canonical" href="https://curtismurray.tech/blog/morphology-tamil/what-it-takes/">
+
+
+
+<meta name="robots" content="index, follow">
+
+
+
+
+
+
+<link rel="shortcut icon" href="/assets/logo/favicon.png"><link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png"><link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png"><link rel="mask-icon" href="/assets/favicons/safari-pinned-tab.svg" color="#da532c"><link rel="manifest" href="/assets/favicons/site.webmanifest"><link rel="preconnect" href="../fonts.googleapis.com/index.html"><link rel="preconnect" href="../fonts.gstatic.com/index.html"><link rel="preconnect" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&#38;amp;family=Roboto+Slab:wght@300;400;500;600;700;800;900&#38;amp;display=swap">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="#ffffff" name="theme-color"><meta content="#da532c" name="msapplication-TileColor"><meta content="/assets/favicons/browserconfig.xml" name="msapplication-config"><meta content="{Part 4 of 4: the transferable recipe behind the Part 3 system. A ReAct loop as the frame, and the four things each of its moves needs — a well-linked ground truth, retrieval tuned for relevance, typed tools, and evaluation at three levels.}" name="description">
+
+    <!-- commom meta tag -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script>
+      // No-flash theme bootstrap. Runs before paint: sets BOTH the DaisyUI
+      // [data-theme] token set and the legacy `dark` class (kept so any
+      // not-yet-migrated `dark:`-class components still resolve). localStorage
+      // key "theme" with values "light"/"dark" is preserved.
+      (function () {
+        var q = new URLSearchParams(location.search).get("theme");
+        if (q === "light" || q === "dark") localStorage.theme = q;
+        var dark =
+          localStorage.theme === "dark" ||
+          (!("theme" in localStorage) &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches);
+        var root = document.documentElement;
+        root.dataset.theme = dark ? "catppuccin" : "autumn-day";
+        root.classList.toggle("dark", dark);
+        // Enable scroll-reveal hiding only now that JS is confirmed running.
+        root.classList.add("reveal-on");
+      })();
+    </script>
+    <script>(function(){const posthogKey = "phc_7JPx8axQMLLglYnDAmiBR2EupAh0NRZiLLKWR0hIq6a";
+const posthogHost = "https://us.i.posthog.com";
+
+          {`!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init(posthogKey,{api_host:posthogHost,person_profiles:"identified_only"});`}
+        })();</script>
+  <link rel="stylesheet" href="/_astro/404.f9f42312.css" />
+<link rel="stylesheet" href="/_astro/admit-it-doesnt-know.814fd8e9.css" />
+<link rel="stylesheet" href="/_astro/admit-it-doesnt-know.d0988e69.css" /><script type="module" src="/_astro/hoisted.41a75609.js"></script></head>
+  <body class="text-base-content">
+    <div id="mtn-scene" aria-hidden="true">
+  <svg viewBox="0 0 1440 640" preserveAspectRatio="xMidYMax slice" width="100%" height="100%">
+    <defs>
+      <linearGradient id="mtn-sky" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" style="stop-color:var(--mtn-sky-top)"></stop>
+        <stop offset="100%" style="stop-color:var(--mtn-sky-bottom)"></stop>
+      </linearGradient>
+      <radialGradient id="mtn-glow" cx="0.7" cy="0.42" r="0.55">
+        <stop offset="0%" style="stop-color:var(--mtn-glow);stop-opacity:0.9"></stop>
+        <stop offset="55%" style="stop-color:var(--mtn-glow);stop-opacity:0.18"></stop>
+        <stop offset="100%" style="stop-color:var(--mtn-glow);stop-opacity:0"></stop>
+      </radialGradient>
+    </defs>
+
+    <rect x="0" y="0" width="1440" height="640" fill="url(#mtn-sky)"></rect>
+    <circle cx="1007.9999999999999" cy="256" r="576" fill="url(#mtn-glow)"></circle>
+
+    <g class="mtn-layer" style="--d:1">
+          <path class="mtn-wave" d="M-70.0,236.5 C-62.7,236.6 -40.7,235.8 -26.1,237.0 C-11.5,238.2 3.1,241.1 17.8,243.6 C32.4,246.1 47.0,250.0 61.7,252.0 C76.3,254.0 90.9,255.9 105.6,255.7 C120.2,255.5 134.8,253.5 149.4,250.9 C164.1,248.3 178.7,243.7 193.3,240.1 C208.0,236.5 222.6,232.2 237.2,229.2 C251.9,226.3 266.5,224.2 281.1,222.6 C295.7,220.9 310.4,220.4 325.0,219.5 C339.6,218.6 354.3,218.0 368.9,217.1 C383.5,216.2 398.1,214.9 412.8,214.3 C427.4,213.7 442.0,213.0 456.7,213.4 C471.3,213.8 485.9,215.1 500.6,216.9 C515.2,218.6 529.8,221.7 544.4,223.9 C559.1,226.1 573.7,228.8 588.3,230.2 C603.0,231.6 617.6,232.0 632.2,232.3 C646.9,232.6 661.5,231.5 676.1,231.9 C690.7,232.3 705.4,232.4 720.0,234.6 C734.6,236.7 749.3,240.2 763.9,244.6 C778.5,248.9 793.1,255.3 807.8,260.7 C822.4,266.1 837.0,272.5 851.7,277.1 C866.3,281.8 880.9,285.7 895.6,288.4 C910.2,291.1 924.8,292.3 939.4,293.4 C954.1,294.4 968.7,294.6 983.3,294.8 C998.0,295.0 1012.6,295.2 1027.2,294.7 C1041.9,294.2 1056.5,293.7 1071.1,292.0 C1085.7,290.3 1100.4,287.7 1115.0,284.6 C1129.6,281.4 1144.3,276.8 1158.9,273.1 C1173.5,269.4 1188.1,265.0 1202.8,262.3 C1217.4,259.7 1232.0,258.0 1246.7,257.4 C1261.3,256.9 1275.9,258.2 1290.6,259.0 C1305.2,259.8 1319.8,261.9 1334.4,262.3 C1349.1,262.7 1363.7,262.7 1378.3,261.5 C1393.0,260.3 1407.6,257.6 1422.2,255.1 C1436.9,252.6 1451.5,249.0 1466.1,246.7 C1480.7,244.4 1502.7,242.2 1510.0,241.3 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-1)" style="--wx:7px; --wy:-2.7px; --wdur:28.6s; --wdelay:-2.6s"></path>
+        </g><g class="mtn-layer" style="--d:2">
+          <path class="mtn-wave" d="M-70.0,283.8 C-62.7,283.3 -40.7,282.1 -26.1,280.4 C-11.5,278.8 3.1,276.5 17.8,273.7 C32.4,271.0 47.0,267.1 61.7,264.0 C76.3,261.0 90.9,257.7 105.6,255.6 C120.2,253.4 134.8,252.3 149.4,251.3 C164.1,250.3 178.7,250.4 193.3,249.8 C208.0,249.3 222.6,248.7 237.2,247.9 C251.9,247.2 266.5,245.6 281.1,245.4 C295.7,245.1 310.4,244.7 325.0,246.4 C339.6,248.1 354.3,251.3 368.9,255.5 C383.5,259.7 398.1,266.2 412.8,271.6 C427.4,277.0 442.0,283.6 456.7,287.7 C471.3,291.8 485.9,294.9 500.6,296.1 C515.2,297.3 529.8,296.0 544.4,294.8 C559.1,293.5 573.7,290.3 588.3,288.5 C603.0,286.7 617.6,284.7 632.2,283.7 C646.9,282.8 661.5,282.9 676.1,283.0 C690.7,283.0 705.4,283.8 720.0,284.0 C734.6,284.2 749.3,284.2 763.9,284.4 C778.5,284.6 793.1,284.4 807.8,285.4 C822.4,286.5 837.0,288.1 851.7,290.9 C866.3,293.6 880.9,298.0 895.6,301.9 C910.2,305.8 924.8,311.1 939.4,314.4 C954.1,317.7 968.7,320.7 983.3,321.9 C998.0,323.2 1012.6,322.5 1027.2,321.9 C1041.9,321.2 1056.5,318.9 1071.1,318.3 C1085.7,317.7 1100.4,317.1 1115.0,318.2 C1129.6,319.4 1144.3,322.2 1158.9,325.0 C1173.5,327.9 1188.1,332.3 1202.8,335.2 C1217.4,338.1 1232.0,341.0 1246.7,342.2 C1261.3,343.3 1275.9,343.1 1290.6,342.2 C1305.2,341.3 1319.8,338.9 1334.4,336.8 C1349.1,334.7 1363.7,332.1 1378.3,329.4 C1393.0,326.7 1407.6,324.1 1422.2,320.4 C1436.9,316.7 1451.5,312.6 1466.1,307.2 C1480.7,301.9 1502.7,291.4 1510.0,288.3 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-2)" style="--wx:-9px; --wy:-3.4px; --wdur:27.2s; --wdelay:-5.2s"></path>
+        </g><g class="mtn-layer" style="--d:3">
+          <path class="mtn-wave" d="M-70.0,351.5 C-62.7,347.3 -40.7,333.6 -26.1,326.0 C-11.5,318.3 3.1,311.0 17.8,305.8 C32.4,300.7 47.0,297.7 61.7,295.1 C76.3,292.5 90.9,291.8 105.6,290.2 C120.2,288.7 134.8,287.4 149.4,285.7 C164.1,284.0 178.7,281.5 193.3,280.0 C208.0,278.5 222.6,276.8 237.2,276.5 C251.9,276.3 266.5,277.2 281.1,278.3 C295.7,279.5 310.4,282.1 325.0,283.6 C339.6,285.1 354.3,286.7 368.9,287.2 C383.5,287.8 398.1,287.1 412.8,287.1 C427.4,287.0 442.0,285.9 456.7,287.2 C471.3,288.4 485.9,290.5 500.6,294.7 C515.2,298.8 529.8,305.6 544.4,312.1 C559.1,318.7 573.7,327.6 588.3,334.1 C603.0,340.5 617.6,347.1 632.2,350.9 C646.9,354.7 661.5,356.4 676.1,357.0 C690.7,357.6 705.4,355.7 720.0,354.5 C734.6,353.4 749.3,351.2 763.9,350.0 C778.5,348.8 793.1,348.1 807.8,347.4 C822.4,346.6 837.0,346.4 851.7,345.4 C866.3,344.5 880.9,343.0 895.6,341.7 C910.2,340.4 924.8,338.2 939.4,337.6 C954.1,337.1 968.7,336.7 983.3,338.4 C998.0,340.2 1012.6,343.8 1027.2,347.9 C1041.9,352.0 1056.5,358.4 1071.1,362.8 C1085.7,367.3 1100.4,372.4 1115.0,374.8 C1129.6,377.2 1144.3,377.8 1158.9,377.3 C1173.5,376.7 1188.1,373.5 1202.8,371.3 C1217.4,369.2 1232.0,365.9 1246.7,364.5 C1261.3,363.1 1275.9,362.7 1290.6,363.0 C1305.2,363.4 1319.8,365.5 1334.4,366.5 C1349.1,367.5 1363.7,369.2 1378.3,369.2 C1393.0,369.2 1407.6,368.2 1422.2,366.5 C1436.9,364.9 1451.5,361.9 1466.1,359.4 C1480.7,356.9 1502.7,352.9 1510.0,351.6 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-3)" style="--wx:11px; --wy:-4.1px; --wdur:25.8s; --wdelay:-7.8s"></path>
+        </g><g class="mtn-layer" style="--d:4">
+          <path class="mtn-wave" d="M-70.0,368.5 C-62.7,365.5 -40.7,355.5 -26.1,350.4 C-11.5,345.2 3.1,341.8 17.8,337.8 C32.4,333.9 47.0,330.3 61.7,326.8 C76.3,323.3 90.9,319.2 105.6,316.8 C120.2,314.4 134.8,312.4 149.4,312.3 C164.1,312.2 178.7,314.0 193.3,316.0 C208.0,318.1 222.6,322.2 237.2,324.6 C251.9,326.9 266.5,329.5 281.1,330.1 C295.7,330.7 310.4,329.4 325.0,328.2 C339.6,326.9 354.3,323.6 368.9,322.7 C383.5,321.8 398.1,321.0 412.8,323.0 C427.4,325.0 442.0,329.5 456.7,334.7 C471.3,339.9 485.9,348.0 500.6,354.3 C515.2,360.5 529.8,367.7 544.4,372.3 C559.1,377.0 573.7,380.1 588.3,382.1 C603.0,384.1 617.6,384.0 632.2,384.3 C646.9,384.7 661.5,384.2 676.1,384.2 C690.7,384.3 705.4,384.8 720.0,384.6 C734.6,384.4 749.3,384.4 763.9,383.0 C778.5,381.7 793.1,379.2 807.8,376.7 C822.4,374.2 837.0,369.9 851.7,368.0 C866.3,366.1 880.9,364.0 895.6,365.1 C910.2,366.2 924.8,369.7 939.4,374.6 C954.1,379.5 968.7,387.7 983.3,394.5 C998.0,401.2 1012.6,409.7 1027.2,415.1 C1041.9,420.4 1056.5,424.6 1071.1,426.8 C1085.7,428.9 1100.4,428.3 1115.0,428.1 C1129.6,427.8 1144.3,425.8 1158.9,425.2 C1173.5,424.6 1188.1,424.3 1202.8,424.6 C1217.4,424.8 1232.0,426.3 1246.7,426.6 C1261.3,426.9 1275.9,427.4 1290.6,426.5 C1305.2,425.6 1319.8,423.4 1334.4,421.0 C1349.1,418.7 1363.7,415.0 1378.3,412.5 C1393.0,410.0 1407.6,407.6 1422.2,405.9 C1436.9,404.1 1451.5,403.8 1466.1,402.0 C1480.7,400.2 1502.7,396.2 1510.0,395.0 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-4)" style="--wx:-13px; --wy:-4.8px; --wdur:24.4s; --wdelay:-10.4s"></path>
+        </g><g class="mtn-layer" style="--d:5">
+          <path class="mtn-wave" d="M-70.0,407.7 C-62.7,408.4 -40.7,412.1 -26.1,411.6 C-11.5,411.1 3.1,408.1 17.8,404.7 C32.4,401.3 47.0,395.1 61.7,391.0 C76.3,387.0 90.9,382.4 105.6,380.4 C120.2,378.4 134.8,378.4 149.4,379.0 C164.1,379.7 178.7,382.7 193.3,384.3 C208.0,386.0 222.6,388.2 237.2,389.0 C251.9,389.8 266.5,389.4 281.1,389.1 C295.7,388.8 310.4,387.4 325.0,387.1 C339.6,386.7 354.3,386.9 368.9,387.1 C383.5,387.4 398.1,388.8 412.8,388.5 C427.4,388.3 442.0,387.9 456.7,385.4 C471.3,382.9 485.9,378.3 500.6,373.6 C515.2,369.0 529.8,361.7 544.4,357.4 C559.1,353.1 573.7,348.4 588.3,347.9 C603.0,347.3 617.6,349.5 632.2,354.0 C646.9,358.5 661.5,367.0 676.1,374.8 C690.7,382.5 705.4,392.7 720.0,400.6 C734.6,408.4 749.3,415.8 763.9,421.9 C778.5,427.9 793.1,432.2 807.8,436.8 C822.4,441.4 837.0,445.1 851.7,449.5 C866.3,454.0 880.9,459.1 895.6,463.5 C910.2,467.9 924.8,472.9 939.4,475.9 C954.1,478.9 968.7,481.0 983.3,481.6 C998.0,482.2 1012.6,480.5 1027.2,479.5 C1041.9,478.4 1056.5,475.9 1071.1,475.5 C1085.7,475.1 1100.4,475.5 1115.0,476.9 C1129.6,478.3 1144.3,482.0 1158.9,483.9 C1173.5,485.8 1188.1,488.7 1202.8,488.1 C1217.4,487.5 1232.0,485.1 1246.7,480.1 C1261.3,475.2 1275.9,466.6 1290.6,458.5 C1305.2,450.4 1319.8,439.6 1334.4,431.5 C1349.1,423.3 1363.7,415.3 1378.3,409.7 C1393.0,404.0 1407.6,400.5 1422.2,397.5 C1436.9,394.5 1451.5,393.3 1466.1,391.7 C1480.7,390.0 1502.7,388.1 1510.0,387.4 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-5)" style="--wx:15px; --wy:-5.5px; --wdur:23.0s; --wdelay:-13.0s"></path>
+        </g><g class="mtn-layer" style="--d:6">
+          <path class="mtn-wave" d="M-70.0,476.2 C-62.7,474.2 -40.7,467.8 -26.1,464.0 C-11.5,460.3 3.1,456.0 17.8,453.5 C32.4,451.0 47.0,450.0 61.7,449.1 C76.3,448.1 90.9,449.1 105.6,447.6 C120.2,446.0 134.8,444.3 149.4,439.6 C164.1,434.8 178.7,427.2 193.3,419.0 C208.0,410.8 222.6,399.2 237.2,390.4 C251.9,381.6 266.5,371.9 281.1,366.3 C295.7,360.8 310.4,357.7 325.0,357.1 C339.6,356.6 354.3,359.9 368.9,363.2 C383.5,366.5 398.1,372.1 412.8,376.9 C427.4,381.6 442.0,386.5 456.7,391.5 C471.3,396.5 485.9,401.0 500.6,406.8 C515.2,412.6 529.8,419.2 544.4,426.2 C559.1,433.3 573.7,442.2 588.3,449.4 C603.0,456.5 617.6,464.4 632.2,469.3 C646.9,474.2 661.5,477.3 676.1,478.7 C690.7,480.1 705.4,478.3 720.0,477.8 C734.6,477.3 749.3,475.0 763.9,475.7 C778.5,476.4 793.1,478.4 807.8,482.0 C822.4,485.7 837.0,492.4 851.7,497.6 C866.3,502.9 880.9,509.9 895.6,513.6 C910.2,517.2 924.8,519.6 939.4,519.6 C954.1,519.6 968.7,516.5 983.3,513.5 C998.0,510.5 1012.6,505.3 1027.2,501.8 C1041.9,498.2 1056.5,494.8 1071.1,492.3 C1085.7,489.8 1100.4,488.6 1115.0,486.8 C1129.6,485.0 1144.3,483.6 1158.9,481.5 C1173.5,479.5 1188.1,476.4 1202.8,474.5 C1217.4,472.6 1232.0,470.0 1246.7,470.2 C1261.3,470.3 1275.9,471.9 1290.6,475.4 C1305.2,478.9 1319.8,485.6 1334.4,491.2 C1349.1,496.7 1363.7,504.6 1378.3,508.6 C1393.0,512.5 1407.6,515.7 1422.2,515.1 C1436.9,514.5 1451.5,510.3 1466.1,505.2 C1480.7,500.1 1502.7,488.0 1510.0,484.5 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-6)" style="--wx:-17px; --wy:-6.2px; --wdur:21.6s; --wdelay:-15.6s"></path>
+        </g><g class="mtn-layer" style="--d:7">
+          <path class="mtn-wave" d="M-70.0,515.2 C-62.7,514.4 -40.7,512.1 -26.1,510.5 C-11.5,508.8 3.1,508.0 17.8,505.4 C32.4,502.7 47.0,499.2 61.7,494.6 C76.3,490.0 90.9,483.1 105.6,477.6 C120.2,472.1 134.8,465.4 149.4,461.7 C164.1,457.9 178.7,455.7 193.3,455.1 C208.0,454.5 222.6,457.0 237.2,458.1 C251.9,459.1 266.5,461.9 281.1,461.3 C295.7,460.7 310.4,458.6 325.0,454.4 C339.6,450.1 354.3,442.4 368.9,436.0 C383.5,429.6 398.1,420.9 412.8,415.9 C427.4,411.0 442.0,407.1 456.7,406.3 C471.3,405.6 485.9,408.1 500.6,411.4 C515.2,414.7 529.8,420.8 544.4,426.2 C559.1,431.6 573.7,437.7 588.3,443.9 C603.0,450.1 617.6,456.0 632.2,463.4 C646.9,470.8 661.5,479.0 676.1,488.2 C690.7,497.5 705.4,508.9 720.0,518.9 C734.6,528.9 749.3,540.4 763.9,548.0 C778.5,555.6 793.1,561.9 807.8,564.7 C822.4,567.6 837.0,566.4 851.7,564.9 C866.3,563.4 880.9,558.3 895.6,555.8 C910.2,553.3 924.8,550.2 939.4,549.9 C954.1,549.6 968.7,551.7 983.3,554.0 C998.0,556.2 1012.6,561.1 1027.2,563.4 C1041.9,565.7 1056.5,568.2 1071.1,568.0 C1085.7,567.8 1100.4,565.3 1115.0,562.4 C1129.6,559.4 1144.3,554.2 1158.9,550.3 C1173.5,546.4 1188.1,542.3 1202.8,539.0 C1217.4,535.7 1232.0,533.6 1246.7,530.7 C1261.3,527.8 1275.9,525.3 1290.6,521.4 C1305.2,517.5 1319.8,512.2 1334.4,507.5 C1349.1,502.7 1363.7,496.2 1378.3,492.8 C1393.0,489.3 1407.6,486.4 1422.2,486.9 C1436.9,487.3 1451.5,491.1 1466.1,495.6 C1480.7,500.0 1502.7,510.5 1510.0,513.4 L1510.0,640 L-70.0,640 Z" fill="var(--mtn-7)" style="--wx:19px; --wy:-6.9px; --wdur:20.2s; --wdelay:-18.2s"></path>
+        </g>
+  </svg>
+</div>
+<div id="mtn-dusk" aria-hidden="true"></div>
+    <div class="relative min-h-screen w-full">
+      <style>astro-island,astro-slot,astro-static-slot{display:contents}</style><script>(()=>{var e=async t=>{await(await t())()};(self.Astro||(self.Astro={})).load=e;window.dispatchEvent(new Event("astro:load"));})();;(()=>{var d;{let p={0:t=>u(t),1:t=>l(t),2:t=>new RegExp(t),3:t=>new Date(t),4:t=>new Map(l(t)),5:t=>new Set(l(t)),6:t=>BigInt(t),7:t=>new URL(t),8:t=>new Uint8Array(t),9:t=>new Uint16Array(t),10:t=>new Uint32Array(t)},h=t=>{let[e,n]=t;return e in p?p[e](n):void 0},l=t=>t.map(h),u=t=>typeof t!="object"||t===null?t:Object.fromEntries(Object.entries(t).map(([e,n])=>[e,h(n)]));customElements.get("astro-island")||customElements.define("astro-island",(d=class extends HTMLElement{constructor(){super(...arguments);this.hydrate=async()=>{var i;if(!this.hydrator||!this.isConnected)return;let e=(i=this.parentElement)==null?void 0:i.closest("astro-island[ssr]");if(e){e.addEventListener("astro:hydrate",this.hydrate,{once:!0});return}let n=this.querySelectorAll("astro-slot"),o={},a=this.querySelectorAll("template[data-astro-template]");for(let r of a){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(o[r.getAttribute("data-astro-template")||"default"]=r.innerHTML,r.remove())}for(let r of n){let s=r.closest(this.tagName);s!=null&&s.isSameNode(this)&&(o[r.getAttribute("name")||"default"]=r.innerHTML)}let c;try{c=this.hasAttribute("props")?u(JSON.parse(this.getAttribute("props"))):{}}catch(r){let s=this.getAttribute("component-url")||"<unknown>",y=this.getAttribute("component-export");throw y&&(s+=` (export ${y})`),console.error(`[hydrate] Error parsing props for component ${s}`,this.getAttribute("props"),r),r}await this.hydrator(this)(this.Component,c,o,{client:this.getAttribute("client")}),this.removeAttribute("ssr"),this.dispatchEvent(new CustomEvent("astro:hydrate"))}}connectedCallback(){!this.hasAttribute("await-children")||this.firstChild?this.childrenConnectedCallback():new MutationObserver((e,n)=>{n.disconnect(),setTimeout(()=>this.childrenConnectedCallback(),0)}).observe(this,{childList:!0})}async childrenConnectedCallback(){let e=this.getAttribute("before-hydration-url");e&&await import(e),this.start()}start(){let e=JSON.parse(this.getAttribute("opts")),n=this.getAttribute("client");if(Astro[n]===void 0){window.addEventListener(`astro:${n}`,()=>this.start(),{once:!0});return}Astro[n](async()=>{let o=this.getAttribute("renderer-url"),[a,{default:c}]=await Promise.all([import(this.getAttribute("component-url")),o?import(o):()=>()=>{}]),i=this.getAttribute("component-export")||"default";if(!i.includes("."))this.Component=a[i];else{this.Component=a;for(let r of i.split("."))this.Component=this.Component[r]}return this.hydrator=c,this.hydrate},e,this)}attributeChangedCallback(){this.hydrate()}},d.observedAttributes=["props"],d))}})();</script><astro-island uid="Z1AdFg0" prefix="r0" component-url="/_astro/Header.0c14ff5c.js" component-export="default" renderer-url="/_astro/client.fe332669.js" props="{&quot;activeMenuId&quot;:[0,&quot;/blog/morphology-tamil/what-it-takes/&quot;],&quot;menuItems&quot;:[1,[[0,{&quot;id&quot;:[0,&quot;item-1.md&quot;],&quot;slug&quot;:[0,&quot;item-1&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;About&quot;],&quot;link&quot;:[0,&quot;/&quot;],&quot;icon&quot;:[0,&quot;FaUser&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-2.md&quot;],&quot;slug&quot;:[0,&quot;item-2&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;the grind&quot;],&quot;link&quot;:[0,&quot;/the-grind/&quot;],&quot;icon&quot;:[0,&quot;FaCoffee&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-5.md&quot;],&quot;slug&quot;:[0,&quot;item-5&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;Photos&quot;],&quot;link&quot;:[0,&quot;/photography/&quot;],&quot;icon&quot;:[0,&quot;FaCamera&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-6.md&quot;],&quot;slug&quot;:[0,&quot;item-6&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;Blog&quot;],&quot;link&quot;:[0,&quot;/blog/&quot;],&quot;icon&quot;:[0,&quot;FaPen&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-7.md&quot;],&quot;slug&quot;:[0,&quot;item-7&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;Contact&quot;],&quot;link&quot;:[0,&quot;#contact&quot;],&quot;icon&quot;:[0,&quot;FaEnvelope&quot;]}],&quot;render&quot;:[0,null]}]]]}" ssr="" client="load" opts="{&quot;name&quot;:&quot;Header&quot;,&quot;value&quot;:true}" await-children=""><div class="lg:hidden"><div class="container flex w-full justify-between py-5 mr-auto ml-auto"><div class="w-full flex justify-between items-center px-4"><a href="/"><h3 class="font-semibold text-base-content">Curtis Murray</h3></a><div class="flex items-center"><button data-theme-toggle="true" aria-label="Toggle theme" type="button" class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-base-content/80 bg-base-200/70 hover:bg-primary hover:text-primary-content transition-all duration-300 ease-in-out"><span class="icon-to-dark"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-lg" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"></path></svg></span><span class="icon-to-light"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-lg" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm246.4 80.5l-94.7-47.3 33.5-100.4c4.5-13.6-8.4-26.5-21.9-21.9l-100.4 33.5-47.4-94.8c-6.4-12.8-24.6-12.8-31 0l-47.3 94.7L92.7 70.8c-13.6-4.5-26.5 8.4-21.9 21.9l33.5 100.4-94.7 47.4c-12.8 6.4-12.8 24.6 0 31l94.7 47.3-33.5 100.5c-4.5 13.6 8.4 26.5 21.9 21.9l100.4-33.5 47.3 94.7c6.4 12.8 24.6 12.8 31 0l47.3-94.7 100.4 33.5c13.6 4.5 26.5-8.4 21.9-21.9l-33.5-100.4 94.7-47.3c13-6.5 13-24.7.2-31.1zm-155.9 106c-49.9 49.9-131.1 49.9-181 0-49.9-49.9-49.9-131.1 0-181 49.9-49.9 131.1-49.9 181 0 49.9 49.9 49.9 131.1 0 181z"></path></svg></span></button><button id="menu-toggle" type="button" class="flex h-10 w-10 cursor-pointer items-center justify-center bg-base-200/70 text-base-content hover:bg-primary hover:text-primary-content transition-all duration-300 ease-in-out ml-3 rounded-full" aria-label="Mobile menu toggle"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" class="text-lg" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M16 132h416c8.837 0 16-7.163 16-16V76c0-8.837-7.163-16-16-16H16C7.163 60 0 67.163 0 76v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 160h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg></button></div></div></div><nav class="hidden"><ul class="block rounded-b-[20px] shadow-lg absolute left-0 top-20 z-[999] w-full bg-base-100/95 backdrop-blur-md"><li><a class="flex cursor-pointer items-center py-3 px-5 font-medium text-sm lowercase transition-all duration-300 ease-in-out text-base-content hover:text-primary" href="/"><span class="mr-3 text-lg"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 448 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"></path></svg></span>About</a></li><li><a class="flex cursor-pointer items-center py-3 px-5 font-medium text-sm lowercase transition-all duration-300 ease-in-out text-base-content hover:text-primary" href="/the-grind/"><span class="mr-3 text-lg"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 640 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M192 384h192c53 0 96-43 96-96h32c70.6 0 128-57.4 128-128S582.6 32 512 32H120c-13.3 0-24 10.7-24 24v232c0 53 43 96 96 96zM512 96c35.3 0 64 28.7 64 64s-28.7 64-64 64h-32V96h32zm47.7 384H48.3c-47.6 0-61-64-36-64h583.3c25 0 11.8 64-35.9 64z"></path></svg></span>the grind</a></li><li><a class="flex cursor-pointer items-center py-3 px-5 font-medium text-sm lowercase transition-all duration-300 ease-in-out text-base-content hover:text-primary" href="/photography/"><span class="mr-3 text-lg"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M512 144v288c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V144c0-26.5 21.5-48 48-48h88l12.3-32.9c7-18.7 24.9-31.1 44.9-31.1h125.5c20 0 37.9 12.4 44.9 31.1L376 96h88c26.5 0 48 21.5 48 48zM376 288c0-66.2-53.8-120-120-120s-120 53.8-120 120 53.8 120 120 120 120-53.8 120-120zm-32 0c0 48.5-39.5 88-88 88s-88-39.5-88-88 39.5-88 88-88 88 39.5 88 88z"></path></svg></span>Photos</a></li><li><a class="flex cursor-pointer items-center py-3 px-5 font-medium text-sm lowercase transition-all duration-300 ease-in-out text-base-content hover:text-primary" href="/blog/"><span class="mr-3 text-lg"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M290.74 93.24l128.02 128.02-277.99 277.99-114.14 12.6C11.35 513.54-1.56 500.62.14 485.34l12.7-114.22 277.9-277.88zm207.2-19.06l-60.11-60.11c-18.75-18.75-49.16-18.75-67.91 0l-56.55 56.55 128.02 128.02 56.55-56.55c18.75-18.76 18.75-49.16 0-67.91z"></path></svg></span>Blog</a></li><li><a class="flex cursor-pointer items-center py-3 px-5 font-medium text-sm lowercase transition-all duration-300 ease-in-out text-base-content hover:text-primary" href="#contact"><span class="mr-3 text-lg"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M502.3 190.8c3.9-3.1 9.7-.2 9.7 4.7V400c0 26.5-21.5 48-48 48H48c-26.5 0-48-21.5-48-48V195.6c0-5 5.7-7.8 9.7-4.7 22.4 17.4 52.1 39.5 154.1 113.6 21.1 15.4 56.7 47.8 92.2 47.6 35.7.3 72-32.8 92.3-47.6 102-74.1 131.6-96.3 154-113.7zM256 320c23.2.4 56.6-29.2 73.4-41.4 132.7-96.3 142.8-104.7 173.4-128.7 5.8-4.5 9.2-11.5 9.2-18.9v-19c0-26.5-21.5-48-48-48H48C21.5 64 0 85.5 0 112v19c0 7.4 3.4 14.3 9.2 18.9 30.6 23.9 40.7 32.4 173.4 128.7 16.8 12.2 50.2 41.8 73.4 41.4z"></path></svg></span>Contact</a></li></ul></nav></div></astro-island>
+      <astro-island uid="Z1A3wwe" prefix="r1" component-url="/_astro/StoryNav.8e5d87a8.js" component-export="default" renderer-url="/_astro/client.fe332669.js" props="{&quot;activeMenuId&quot;:[0,&quot;/blog/morphology-tamil/what-it-takes/&quot;],&quot;menuItems&quot;:[1,[[0,{&quot;id&quot;:[0,&quot;item-1.md&quot;],&quot;slug&quot;:[0,&quot;item-1&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;About&quot;],&quot;link&quot;:[0,&quot;/&quot;],&quot;icon&quot;:[0,&quot;FaUser&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-2.md&quot;],&quot;slug&quot;:[0,&quot;item-2&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;the grind&quot;],&quot;link&quot;:[0,&quot;/the-grind/&quot;],&quot;icon&quot;:[0,&quot;FaCoffee&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-5.md&quot;],&quot;slug&quot;:[0,&quot;item-5&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;Photos&quot;],&quot;link&quot;:[0,&quot;/photography/&quot;],&quot;icon&quot;:[0,&quot;FaCamera&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-6.md&quot;],&quot;slug&quot;:[0,&quot;item-6&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;Blog&quot;],&quot;link&quot;:[0,&quot;/blog/&quot;],&quot;icon&quot;:[0,&quot;FaPen&quot;]}],&quot;render&quot;:[0,null]}],[0,{&quot;id&quot;:[0,&quot;item-7.md&quot;],&quot;slug&quot;:[0,&quot;item-7&quot;],&quot;body&quot;:[0,&quot;&quot;],&quot;collection&quot;:[0,&quot;menu&quot;],&quot;data&quot;:[0,{&quot;name&quot;:[0,&quot;Contact&quot;],&quot;link&quot;:[0,&quot;#contact&quot;],&quot;icon&quot;:[0,&quot;FaEnvelope&quot;]}],&quot;render&quot;:[0,null]}]]]}" ssr="" client="load" opts="{&quot;name&quot;:&quot;StoryNav&quot;,&quot;value&quot;:true}" await-children=""><header class="[view-transition-name:vt-nav] hidden lg:flex sticky top-0 z-50 items-center justify-between px-10 xl:px-16 py-6 backdrop-blur-[2px]"><a href="/" class="text-lg font-semibold tracking-tight text-base-content hover:text-primary transition-colors">Curtis Murray</a><nav class="flex items-center gap-6"><ul class="flex items-center gap-6"><li><a href="/" class="text-sm font-medium lowercase transition-colors text-base-content/70 hover:text-primary">About</a></li><li><a href="/the-grind/" class="text-sm font-medium lowercase transition-colors text-base-content/70 hover:text-primary">the grind</a></li><li><a href="/photography/" class="text-sm font-medium lowercase transition-colors text-base-content/70 hover:text-primary">Photos</a></li><li><a href="/blog/" class="text-sm font-medium lowercase transition-colors text-base-content/70 hover:text-primary">Blog</a></li><li><a href="#contact" class="text-sm font-medium lowercase transition-colors text-base-content/70 hover:text-primary">Contact</a></li></ul><button data-theme-toggle="true" aria-label="Toggle theme" type="button" class="flex h-10 w-10 items-center justify-center rounded-full text-base-content/80 hover:text-primary hover:bg-base-200/60 transition-all"><span class="icon-to-dark"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-lg" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"></path></svg></span><span class="icon-to-light"><svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 512 512" class="text-lg" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg"><path d="M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm246.4 80.5l-94.7-47.3 33.5-100.4c4.5-13.6-8.4-26.5-21.9-21.9l-100.4 33.5-47.4-94.8c-6.4-12.8-24.6-12.8-31 0l-47.3 94.7L92.7 70.8c-13.6-4.5-26.5 8.4-21.9 21.9l33.5 100.4-94.7 47.4c-12.8 6.4-12.8 24.6 0 31l94.7 47.3-33.5 100.5c-4.5 13.6 8.4 26.5 21.9 21.9l100.4-33.5 47.3 94.7c6.4 12.8 24.6 12.8 31 0l47.3-94.7 100.4 33.5c13.6 4.5 26.5-8.4 21.9-21.9l-33.5-100.4 94.7-47.3c13-6.5 13-24.7.2-31.1zm-155.9 106c-49.9 49.9-131.1 49.9-181 0-49.9-49.9-49.9-131.1 0-181 49.9-49.9 131.1-49.9 181 0 49.9 49.9 49.9 131.1 0 181z"></path></svg></span></button></nav></header></astro-island>
+      <main class="[view-transition-name:vt-content]">
+            <div class="container mr-auto ml-auto px-4 sm:px-6 lg:px-10 pt-6 lg:pt-10 pb-20">
+              <div class="rounded-2xl bg-base-100/80 backdrop-blur-md shadow-xl ring-1 ring-base-300/40 p-6 sm:p-10 lg:p-12 reveal reveal-1">
+                
+  
+  <div class="wrap">
+    <header>
+      <div class="kicker">
+        Creating the first morphological analyser for Spoken Tamil · Part 4 of 4
+      </div>
+      <h1>The recipe: what it takes to make a model admit it doesn't know</h1>
+      <p class="standfirst">
+        Part 3 showed one system work, traced end to end. This is the recipe behind
+        it — the loop the model runs, and the things that have to be true for that loop
+        to make it say "I don't have this" instead of inventing an answer. Tamil is the
+        worked example; the spine holds in any domain that is small, specialised, and
+        mostly absent from training data.
+      </p>
+      <div class="byline">
+        Curtis Murray · the transferable recipe behind the Part&nbsp;3 system
+      </div>
+    </header>
+
+    <p class="lede">
+      Across this series we went from <a href="/blog/morphology-tamil/what-is-morphological-analysis">what the problem is</a> to <a href="/blog/morphology-tamil/where-llms-go-wrong">why a language model fails
+      at it invisibly</a> to <a href="/blog/morphology-tamil/admit-it-doesnt-know">a system
+      that doesn't</a>. That last post told the story of one run. This one pulls back to
+      the method, because the interesting part isn't Tamil — it's that the same handful of
+      ingredients make any model honest about the edge of its knowledge. Miss one and the
+      guarantee leaks: the model goes back to sounding confident about things it
+      has no basis for.
+    </p>
+
+    <p>
+      Here is the whole recipe in one view. Each row is a section below.
+    </p>
+
+    <figure>
+      <table class="data">
+        <thead>
+          <tr>
+            <th style="width:34px"></th>
+            <th>Ingredient</th>
+            <th>In one line</th>
+            <th>What breaks without it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="m">1</td>
+            <td><b>The loop the model runs</b></td>
+            <td>A defined ReAct loop — propose, ground, revise, commit — with a clear bar for "done": <em>groundedness, not confidence.</em></td>
+            <td>The model calls tools ad hoc and stops when it <em>feels</em> sure: Part&nbsp;2 all over again.</td>
+          </tr>
+          <tr>
+            <td class="m">2</td>
+            <td><b>A ground truth worth grounding in</b></td>
+            <td>A small, curated, <em>well-linked</em> store of what's actually attested — meaning flows through structure, never orphaned facts.</td>
+            <td>You ground in garbage and get confident garbage, just with a citation.</td>
+          </tr>
+          <tr>
+            <td class="m">3</td>
+            <td><b>Retrieval tuned for relevance</b></td>
+            <td>The query under the tool puts the <em>right</em> nodes in front of the model — minimal noise, minimal tokens.</td>
+            <td>The real answer is in the graph but never reaches the model, or arrives buried in distractors.</td>
+          </tr>
+          <tr>
+            <td class="m">4</td>
+            <td><b>Typed tools that expose it</b></td>
+            <td>A fixed set of schema-validated tools is the only path in; they wrap the queries and adjudicate writes.</td>
+            <td>The model runs raw queries, invents structure, and the curated store rots.</td>
+          </tr>
+          <tr>
+            <td class="m">5</td>
+            <td><b>Monitoring and evaluation</b></td>
+            <td>Three levels of signal — tool-call logging, reason-before / review-after annotations, and trajectory metrics + reflection — over a gold set when you have one.</td>
+            <td>"It works on the demo." You can't see drift, can't localise failure, can't improve on purpose.</td>
+          </tr>
+        </tbody>
+      </table>
+      <figcaption>
+        The recipe at a glance. Row 1 is the frame — the loop the model actually runs. The
+        four beneath it are what each move of that loop needs to be real rather than theatre.
+      </figcaption>
+    </figure>
+
+    <h2><span class="num">01</span>The loop the model runs</h2>
+
+    <p>
+      Start with the shape of the whole thing, because everything else hangs off it. The
+      method is a <strong>loop</strong>: the model proposes a hypothesis, grounds every
+      piece of it against a source of truth, treats a rejection as structured feedback and
+      revises, and commits only once nothing is left ungrounded. This is the
+      <strong>ReAct</strong> loop — <em>Reason, Act, Observe</em>, repeat — and the crucial
+      detail is the bar for "done": not the model's confidence, but
+      <strong>groundedness</strong>. It writes when everything resolves, not when it feels
+      sure. One definition, held throughout the series: <em>grounded</em> means every claim
+      resolves to attested structure in the graph through a typed validation path — not
+      "has a citation," not "came from retrieval," not "probably true."
+    </p>
+
+    <p>
+      Why insist on a loop at all, rather than just good tools? Because a model handed
+      excellent tools and no process will use them ad hoc — call a couple, form an
+      impression, and stop the moment it <em>feels</em> confident. That feeling is exactly
+      the failure from <a href="/blog/morphology-tamil/where-llms-go-wrong">Part&nbsp;2</a>:
+      fluent, confident, and wrong. A defined loop with a clear
+      <strong>committable target</strong> — a state it is allowed to write only once
+      everything checks out — is what converts a capable model from a confident guesser into
+      something that keeps checking until it actually has support, or reports that it can't
+      get any.
+    </p>
+
+    <div class="react" style="justify-content:center">
+      <span class="s">Reason: form / revise a hypothesis</span><span class="a">→</span>
+      <span class="s">Act: one tool call</span><span class="a">→</span>
+      <span class="s">Observe: structured feedback</span><span class="a">↺</span>
+      <span class="s">…until grounded</span><span class="a">→</span>
+      <span class="s">Act: atomic write</span>
+    </div>
+
+    <p>
+      The loop has three moves, and <strong>the rest of this post is what each move needs to
+      be real rather than theatre</strong>:
+    </p>
+
+    <ul class="takeaway">
+      <li>
+        <b>Act</b> grounds a claim against something it can't override — so it needs a
+        <em>well-linked ground truth</em> (§02), found through a <em>relevance-tuned
+        query</em> (§03), reached through a <em>typed tool</em> (§04). Three ingredients,
+        one move.
+      </li>
+      <li>
+        <b>Observe</b> turns the result into the structured feedback the model reasons over
+        next — and, scaled across runs, into the raw material for <em>evaluation</em> (§05).
+        A rejection isn't a dead end; it's an Observe that feeds the next Reason.
+      </li>
+      <li>
+        <b>Reason</b> is the move this section already covered: the process and the
+        committable target that keep the model honest about when it's allowed to stop.
+      </li>
+    </ul>
+
+    <p>
+      This is why ReAct pairs so naturally with grounding: its unit of work — one
+      Reason/Act/Observe step — is also the unit you <em>constrain</em>, the unit you
+      <em>log</em>, and the unit you <em>evaluate</em>. The loop is the connective tissue
+      that makes the four ingredients below composable and observable instead of a pile of
+      disconnected best practices.
+    </p>
+
+    <h2><span class="num">02</span>A ground truth worth grounding in</h2>
+
+    <p>
+      Take the <em>Act</em> move first: it grounds a claim against a source of truth. That
+      source is only as good as its contents — grounding in a noisy, half-attested, or
+      internally contradictory store just produces confident nonsense that now looks
+      sourced. So this ingredient is the least glamorous and the most load-bearing: a
+      <strong>small, curated, authoritative store</strong> that can only confirm or deny,
+      never generate. In the Tamil system that's a hand-verified Neo4j graph encoding
+      Schiffman's <em>Reference Grammar of Spoken Tamil</em>.
+    </p>
+
+    <p>
+      But size and curation aren't enough. The store has to be <strong>well-linked</strong>,
+      and in a specific way: meaning must flow through structure rather than hang off
+      individual facts. Part&nbsp;3's <a href="/blog/morphology-tamil/admit-it-doesnt-know#traced-run">triad</a> is the example — the graph never draws a <code>Morpheme → meaning</code> edge,
+      because the same morpheme <span class="ta">(வி)டு</span> means different things in
+      different constructions. Meaning is read off the <em>Construction → Morpheme →
+      Concept</em> triple. That linking decision is what lets a claim like "this
+      <span class="ta">(வி)டு</span> means completive" be checked in a single query: it
+      either resolves to an existing triad or it doesn't. Orphaned facts can't be checked
+      that cleanly — there's nothing for a hypothesis to resolve <em>against</em>.
+    </p>
+
+    <div class="callout">
+      <span class="tag">The transferable bit</span>
+      <p>
+        Don't ask "do I have a knowledge base?" Ask "is meaning in my knowledge base
+        <em>relational</em> — can an arbitrary claim be reduced to 'does this specific
+        structure exist?'" If yes, an unsupported structural claim becomes catchable instead
+        of merely regrettable. If your facts are flat key→value strings, the model can still drift
+        between plausible neighbours and nothing will object.
+      </p>
+    </div>
+
+    <h2><span class="num">03</span>Retrieval tuned for relevance</h2>
+
+    <p>
+      Act can only ground against a fact it can actually <em>find</em> — which is a
+      different problem from having it. And here's the distinction that's easy to blur.
+      <span class="nm" style="font-family:var(--mono);color:var(--accent)">word_lookup</span>
+      is not the retrieval system — it's a <em>tool call</em>, a doorway. The retrieval
+      system is the <strong>query underneath it</strong>: the Cypher that ranks
+      surface-similar neighbours by longest common substring, caps the result set, and
+      returns them with match scores. The tool is the contract (ingredient 4); the query is
+      the information-retrieval engine, and it has to be tuned in its own right.
+    </p>
+
+    <p>
+      Tuned toward what, exactly? <strong>Maximising <em>relevant</em> retrieval</strong> —
+      which is not the same as maximising retrieval. The goal is to get the right nodes in
+      front of the model with as little noise as possible and as few tokens as possible.
+      There are two ways to fail, in opposite directions:
+    </p>
+
+    <ul class="toollist">
+      <li>
+        <span class="nm">Under-retrieval</span>
+        <div class="ds">
+          The relevant node exists in the graph but the query doesn't surface it — wrong
+          ranking, too tight a filter, the wrong entry point. The model, finding nothing,
+          falls back on its prior and <em>invents</em>. The graph had the answer; the
+          retrieval never delivered it.
+        </div>
+      </li>
+      <li>
+        <span class="nm">Over-retrieval</span>
+        <div class="ds">
+          The query dumps the whole neighbourhood — two hundred loosely related nodes —
+          and the one that matters is buried among distractors. Noise pulls the model
+          toward a plausible red herring, and every irrelevant node spends tokens and
+          attention you don't get back. More context is not more grounding.
+        </div>
+      </li>
+    </ul>
+
+    <p>
+      So the levers are all about precision: <strong>ranking and scoring</strong> so the
+      best candidates come first; <strong>capping</strong> result counts; returning a
+      <strong>tight closure</strong> (the triad, not a raw subgraph dump); and offering
+      <strong>multiple entry points</strong> — <span class="nm" style="font-family:var(--mono);color:var(--accent)">search_*</span> reaches the
+      graph by surface form, by gloss, or by meaning, because you arrive at a problem
+      knowing different things on different turns. A perfectly curated graph (ingredient 2)
+      is inert if the right node never reaches the model, or reaches it drowned in a
+      hundred it didn't need.
+    </p>
+
+    <h2><span class="num">04</span>Typed tools that expose it</h2>
+
+    <p>
+      Both the graph and its queries reach the model through one narrow channel — and that
+      channel is the third thing <em>Act</em> needs. The model never touches the graph
+      directly. It can't run a query or hand-write a node. It gets a fixed set of
+      <strong>typed tools</strong> over the Model Context Protocol — schema-validated
+      requests, so a malformed call fails harmlessly instead of corrupting a curated store.
+      This is the layer where the queries from ingredient 3 are wrapped and exposed: one
+      typed tool is the stable, documented contract; the carefully tuned query is what runs
+      behind it. Keeping them separate matters — you re-tune the query without changing the
+      model's interface, and you constrain what the model can ask without constraining how
+      well the graph can answer.
+    </p>
+
+    <p>
+      Two properties earn their keep. First, the tools <strong>constrain the action
+      space</strong>: a fixed vocabulary of calls is the only path in, so the model can't
+      invent structure or reach around the guardrails. Second, they answer in
+      <strong>prose with embedded structured fields</strong>, never raw JSON — that forces
+      the model to weigh the evidence and judge, rather than branch on a magic number. And
+      the unglamorous invariants — validation, normalisation, atomic writes, the ~12 checks
+      before <span class="nm" style="font-family:var(--mono);color:var(--accent)">create_wordform</span> commits — live <em>once</em>, in code, instead of being
+      re-derived from a prompt every session.
+    </p>
+
+    <h2><span class="num">05</span>Monitoring and evaluation</h2>
+
+    <p>
+      The last ingredient is the <em>Observe</em> move scaled up — across one run, and then
+      across many. This is where most grounded systems are thinnest. "It works on the demo"
+      is not a measurement, and a single held-out accuracy number — useful as it is — misses
+      most of what you need to actually run and improve the thing. Evaluation here is a
+      <strong>stack of signals at three levels</strong>, most of which fall straight out of
+      logging the loop and need no external harness, plus the gold-standard accuracy eval on
+      top.
+    </p>
+
+    <ul class="toollist">
+      <li>
+        <span class="nm">Level 1 · Tool-call logging — the mechanical signals</span>
+        <div class="ds">
+          One structured line per call, keyed by session. The cheap, automatic, label-free
+          questions: <em>was the tool called? did it fail</em> (schema error, exception)?
+          <em>did it return anything, or null? how long did the call take? how many times
+          was each tool used?</em> These catch regressions and degenerate behaviour the
+          moment they appear — a tool that suddenly always returns null, a loop that calls
+          the same search forty times — with no annotation required.
+        </div>
+      </li>
+      <li>
+        <span class="nm">Level 2 · Reason-before / review-after — the intent signals</span>
+        <div class="ds">
+          The important addition, and the one people skip. <em>Before</em> each call the
+          agent states <strong>why</strong> it's making it and <strong>what it expects
+          back</strong>. <em>After</em>, it reviews: did the result match the expectation,
+          did the tool do its job, what were the pain points. Now a log line carries intent
+          + prediction + post-hoc judgement — so you can find where the model's picture of
+          the world diverged from the graph, not just where a call threw an error. A call
+          that "succeeded" but returned the opposite of what the agent predicted is invisible
+          at Level 1 and obvious here.
+        </div>
+        <div class="why">
+          <b>Why it matters:</b> errors are easy to log; <em>wrong but error-free</em> is
+          where grounded systems fail without throwing an error. Expectation-vs-result is how you surface it.
+        </div>
+      </li>
+      <li>
+        <span class="nm">Level 3 · Trajectory — the whole-run signals</span>
+        <div class="ds">
+          Per run: <em>how many tools were used, total wall-clock time, path length, how
+          many refine loops, did it reach a verified commit.</em> Plus
+          <strong>trajectory reflection</strong> — the agent looking back over the entire
+          run and saying what was hard and what it would do differently. Aggregate these
+          across many runs and you're measuring <em>behavioural drift</em>: the path getting
+          longer, refines climbing, time creeping up — a regression you'd never see from
+          a pass/fail on the final answer.
+        </div>
+      </li>
+    </ul>
+
+    <div class="callout">
+      <span class="tag">And the gold set, on top</span>
+      <p>
+        Everything above measures <em>consistency and behaviour</em> — that the system
+        grounded its claims and behaved sanely. It does <strong>not</strong> measure
+        <em>linguistic correctness</em>; for that you need a held-out, expert-annotated set
+        of segmentations and gloss-level accuracy. That set is still the open milestone for
+        the Tamil system, and I'd rather say so than imply a metric I don't have. The point
+        of the three levels is that you get most of your eval — and all of your drift
+        detection — long before, and independent of, the gold set.
+      </p>
+    </div>
+
+    <hr class="sec">
+
+    <h2><span class="num">∴</span>Groundedness isn't robustness</h2>
+
+    <p>
+      The five ingredients share one unstated assumption: that a single run, fully
+      grounded, is a single run you can trust. It is grounded — but
+      <strong>grounded and robust are different properties</strong>, and the gap
+      between them is its own failure mode. A grounded agent isn't reasoning over
+      the whole knowledge base; it's reasoning over the slice its retrieval path
+      exposed. Every move in §01's loop — a search term, an
+      intermediate hypothesis, which neighbour it anchored on first — conditions the
+      hypothesis space the next move can even consider. Retrieval isn't passive evidence
+      access; it's active trajectory shaping. One unlucky early step (a slightly-off query,
+      an overconfident first guess) can steer the rest of the run into the wrong
+      region of the graph, and every later step can still be <em>perfectly grounded
+      relative to that trajectory</em>. The result isn't hallucination — Part&nbsp;3
+      watched the graph catch that. It's <strong>premature convergence</strong>: the
+      system confidently consistent inside a bad basin.
+    </p>
+
+    <p>
+      <a href="/blog/morphology-tamil/where-llms-go-wrong">Part&nbsp;2</a> already
+      used the cure once. Eight runs of the <em>ungrounded</em> model landed in
+      different basins, and that disagreement was the tell that it was generating,
+      not recovering. The grounded agent earns the same test — only now the variation
+      lives one level up, in the <em>trajectory</em> rather than the answer. Run it
+      several times — different temperatures, retrieval seeds, prompt phrasings, even
+      different model providers — and read the distribution. Agreement across
+      independent traces is evidence the conclusion is robust to how the search
+      unfolded; disagreement is the signal that the answer depends on the path taken
+      to reach it. This is repeated-sampling uncertainty in the spirit of
+      Monte-Carlo dropout: one run gives an answer, a spread of runs reveals
+      stability — though it stays a <em>diagnostic of instability, not a calibrated
+      probability</em>.
+    </p>
+
+    <p>
+      The catch: those traces aren't truly independent. They share an architecture, a
+      retrieval strategy, a tool vocabulary — and shared bias steers them the same
+      way. Ten runs of one brittle loop can converge on the same wrong basin and look
+      reassuringly stable. So vary what actually breaks the symmetry (different
+      providers especially, since they don't share priors), and lean on
+      <strong>post-run validation</strong>: re-check a finished trajectory against an
+      alternative trace, a verifier model, or a different retrieval strategy. The
+      goal isn't a majority vote for truth — it's detecting when a conclusion is
+      fragile to the search that produced it. None of which is free: every extra
+      trace, verifier pass and refine loop is more tokens and more wall-clock.
+      <strong>Reliability, here, is purchased with search</strong> — a real line on
+      the bill, not a rounding error, and worth spending deliberately rather than by
+      default.
+    </p>
+
+    <div class="callout">
+      <span class="tag">Four questions, not one</span>
+      <p>
+        <b>Groundedness</b> — did every claim resolve to attested structure? (§02–04)
+        &nbsp;·&nbsp; <b>Correctness</b> — does it match expert truth? (the gold set,
+        §05) &nbsp;·&nbsp; <b>Robustness</b> — do independent trajectories converge?
+        (this section) &nbsp;·&nbsp; <b>Calibration</b> — does it know when it might
+        be wrong? (<code>search_matching_wordforms</code> returning null). The recipe
+        nails the first; this section is how you stop mistaking it for the other
+        three.
+      </p>
+    </div>
+
+    <p>
+      The five ingredients make one run honest about the edge of the graph. This
+      makes you honest about the edge of the run.
+    </p>
+
+    <hr class="sec">
+
+    <h2 style="text-align:center"><span class="num">★</span>What generalises</h2>
+
+    <p style="max-width:720px;margin:0 auto 18px;text-align:center;color:var(--dim)">
+      Three ways a grounded system still fails — and that they need three <em>different</em>
+      mechanisms to catch is the whole point:
+    </p>
+
+    <figure>
+      <table class="data">
+        <thead>
+          <tr>
+            <th>Failure</th>
+            <th>Example</th>
+            <th>Caught by</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Unsupported structure</b></td>
+            <td>an illegal allomorph; a relabelled morpheme</td>
+            <td class="m">grounding · §02–04</td>
+          </tr>
+          <tr>
+            <td><b>Wrong trajectory</b></td>
+            <td>a plausible but incomplete basin, reached by one bad early step</td>
+            <td class="m">robustness · multiple traces (∴)</td>
+          </tr>
+          <tr>
+            <td><b>Missing / wrong ontology</b></td>
+            <td>the graph lacks the phenomenon, or its schema mis-frames it</td>
+            <td class="m">human eval · the gold set (§05)</td>
+          </tr>
+        </tbody>
+      </table>
+      <figcaption>
+        Grounding catches only the first row. The reflex to watch for is assuming it catches
+        all three — it doesn't, and the other two are where confident, well-sourced systems
+        go wrong without any sign of it.
+      </figcaption>
+    </figure>
+
+    <div class="takeaway" style="max-width:820px;margin:16px auto 0">
+      <ul>
+        <li>
+          <b>The domain shape, not the domain.</b> This recipe earns its keep wherever the
+          ground truth is small, specialised, and largely absent from a model's training
+          data — Spoken Tamil morphology here, clinical entity linking in the work Part&nbsp;3
+          gestured at. Different field, identical spine.
+        </li>
+        <li>
+          <b>Each ingredient guards a different failure.</b> No loop and the model stops
+          when it feels sure; a bad store gives sourced nonsense; bad retrieval starves or
+          drowns the model; missing tools let it freelance; no eval hides the drift. They
+          aren't interchangeable, and the guarantee is only as strong as the weakest one —
+          and even all five guard only a single run: robustness is a separate axis, so run
+          it again, differently, and see if it agrees.
+        </li>
+        <li>
+          <b>What you get, honestly.</b> Consistency, observability, and a model that says
+          "I don't have this" instead of fabricating — <code>search_matching_wordforms</code>
+          returning null rather than inventing a parent. What you don't get for free is
+          omniscience. Grounding buys <em>provenance, not truth</em> — a claim resolves to
+          attested structure, which is not the same as being correct, and that gap is
+          exactly what the gold set measures. And it buys no new ground: absence from the
+          graph becomes absence from reality, so the system inherits the blind spots
+          of its substrate — and the assumptions baked into it, because a schema is a theory
+          and a construction an interpretation, not a neutral container. Which is the honest
+          tell about where the work went — the
+          expertise isn't discovered by the agent at run time; it was moved there ahead of
+          time, into the ontology, the schema, the retrieval shaping and the invariants the
+          model can't override. The recipe makes a model honest about the edge of its
+          knowledge. It doesn't move that edge — a human drew it.
+        </li>
+      </ul>
+    </div>
+
+    <footer>
+      <span class="src">source: logs/tool-calls.jsonl · the recipe behind the Part 3 run</span>
+      <span>Tamil Morphology MCP · neuro-symbolic agent system · Curtis Murray</span>
+    </footer>
+  </div>
+
+
+  <nav class="series-nav">
+    <a class="prev" href="/blog/morphology-tamil/admit-it-doesnt-know">
+          <span class="dir">← Part 3</span>
+          <span class="ttl">Teaching a model to admit it doesn&#39;t know</span>
+        </a>
+    <a class="hub" href="/blog/">Series home</a>
+    <a class="next" href="/blog/morphology-tamil/what-is-morphological-analysis">
+          <span class="dir">Start over →</span>
+          <span class="ttl">Part 1 · What is morphological analysis?</span>
+        </a>
+  </nav>
+
+  <script src="/blog/morphology-tamil/audio-data.js"></script>
+  <script src="/blog/morphology-tamil/shared/morphology-data.js"></script>
+  <script src="/blog/morphology-tamil/shared/morphology-engine.js"></script>
+
+              </div>
+            </div>
+            <footer id="contact" class="relative mt-16 bg-neutral text-neutral-content rounded-t-[2.5rem] overflow-hidden scroll-mt-24">
+  <div class="container mx-auto px-6 lg:px-16 py-16 sm:py-24">
+    <div class="io-reveal max-w-3xl">
+      <p class="text-sm font-medium tracking-[0.16em] opacity-70 mb-4">
+        looking to join a team solving real problems
+      </p>
+      <h2 class="font-slab font-bold text-4xl sm:text-5xl tracking-tight lowercase">
+        <script>(()=>{var r=(i,c,n)=>{let s=async()=>{await(await i())()},t=new IntersectionObserver(e=>{for(let o of e)if(o.isIntersecting){t.disconnect(),s();break}});for(let e of n.children)t.observe(e)};(self.Astro||(self.Astro={})).visible=r;window.dispatchEvent(new Event("astro:visible"));})();</script><astro-island uid="ZHHd6X" prefix="r2" component-url="/_astro/TypeOnView.fbfd4902.js" component-export="default" renderer-url="/_astro/client.fe332669.js" props="{&quot;text&quot;:[0,&quot;let&#39;s build something you can trust.&quot;]}" ssr="" client="visible" opts="{&quot;name&quot;:&quot;TypeOnView&quot;,&quot;value&quot;:true}" await-children=""><span class="relative block"><span class="invisible" aria-hidden="true">let&#x27;s build something you can trust.</span><span class="absolute inset-0"><span class="type-caret" aria-hidden="true"></span></span></span></astro-island>
+      </h2>
+      <a href="mailto:curtis@curtismurray.tech" class="group inline-flex items-center gap-3 mt-8 text-xl sm:text-2xl font-medium underline-offset-8 hover:underline">
+        curtis@curtismurray.tech
+        <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
+      </a>
+    </div>
+
+    <p class="io-reveal mt-12 max-w-2xl text-base sm:text-lg leading-relaxed opacity-80">
+      not hiring? stay a while — <a href="/the-grind/" class="text-[#f2a594] font-medium underline underline-offset-4 decoration-[#f2a594]/50 hover:decoration-[#f2a594] transition-colors">judge my life choices</a>, <a href="/blog/" class="text-[#f2a594] font-medium underline underline-offset-4 decoration-[#f2a594]/50 hover:decoration-[#f2a594] transition-colors">read a post</a>, or just <a href="/photography/" class="text-[#f2a594] font-medium underline underline-offset-4 decoration-[#f2a594]/50 hover:decoration-[#f2a594] transition-colors">stop for some photos of birds</a>.
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium">
+      <a href="https://www.linkedin.com/in/curtiswmurray/" target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">be an edge in my network</a>
+      <a href="https://scholar.google.com.au/citations?user=25fFcUUAAAAJ&#38;hl=en&#38;oi=ao" target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">cite my papers????</a>
+    </div>
+
+    <div class="mt-14 pt-6 border-t border-neutral-content/15 flex flex-wrap justify-between gap-4 text-xs opacity-60">
+      <span>Curtis Murray, PhD · Melbourne, Australia</span>
+      <span>© 2026 · Built with Astro</span>
+    </div>
+  </div>
+</footer>
+          </main>
+    </div>
+    
+    
+  </body>
+</html>

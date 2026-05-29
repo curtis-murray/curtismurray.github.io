@@ -1,0 +1,1 @@
+function a(){typeof window>"u"||window.__themeWired||(window.__themeWired=!0,document.addEventListener("click",n=>{if(!n.target.closest?.("[data-theme-toggle]"))return;const t=document.documentElement,e=!t.classList.contains("dark");t.classList.toggle("dark",e),t.dataset.theme=e?"catppuccin":"autumn-day",localStorage.setItem("theme",e?"dark":"light")}))}export{a as t};

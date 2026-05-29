@@ -1,0 +1,179 @@
+---
+import BlogPostLayout from "../../../layouts/BlogPostLayout.astro";
+---
+
+<BlogPostLayout
+  title="What is morphological analysis? — Spoken Tamil morphology, Part 1 · Curtis Murray"
+  description="Part 1 of 4: breaking a word into its smallest meaningful pieces, built on one Spoken Tamil root. Interactive — no Tamil required."
+  next={{
+    href: "/blog/morphology-tamil/where-llms-go-wrong",
+    dir: "Part 2 →",
+    ttl: "Where a language model goes wrong",
+  }}
+>
+  <div class="wrap">
+    <header>
+      <div class="kicker">
+        Creating the first morphological analyser for Spoken Tamil · Part 1 of 4
+      </div>
+      <h1>What is morphological analysis?</h1>
+      <p class="standfirst">
+      Words often contain grammatical structure that influences their function in a sentence, and understanding that structure can be significantly harder than it seems. We explore this idea in Tamil, using the Tamil root, <span class="ta">படி</span> "study".
+      </p>
+      <div class="byline">
+        Curtis Murray · Every Tamil word below is interactive.
+      </div>
+    </header>
+
+    <p class="lede">
+      Every word you read, you pull apart without noticing. <span class="term" tabindex="0">Morphological analysis<span class="termpop">Breaking a word into its smallest meaningful pieces and naming what each one does.</span></span> is the process of breaking a word into its smallest
+      meaningful pieces (its <span class="term" tabindex="0">morphemes<span class="termpop">The smallest unit of a word that still carries meaning, such as <code>learn</code>, <code>-er</code> or <code>-s</code>.</span></span>) and naming what each one
+      does. In your own language you manage it effortlessly. A computer faced with a low-resource, unstandardised, linguistically diverse language that is almost never written (looking at you, spoken Tamil)<span class="fn"><button type="button" class="fnref" aria-label="Footnote 1" aria-describedby="fn-1">1</button><span class="fnpop" id="fn-1" role="note">Tamil is strongly diglossic. Its literary register has been written and codified for well over a millennium, and it differs substantially from the colloquial Tamil that people actually speak, which is only rarely written down. The grammar, the vocabulary and even the pronunciation diverge. Where this series refers to <em>spoken Tamil</em>, it means the everyday colloquial register of Tamil Nadu.</span></span>, has, shall we say, some difficulties. This post is the first part of the story, exploring
+      what the analysis actually <em>is</em>. Everything is built on one spoken
+      Tamil verb root, <span class="ta">படி</span
+      > "study", and you need no Tamil to follow: you can hear and unpack every word
+      as you read.
+    </p>
+
+    <div class="aside tryit">
+      <h4><span class="ico">▶</span>Try it — this page is the app</h4>
+      <p style="margin:0;font-size:14px;max-width:none">
+        Every <span class="ta">Tamil word</span> below is live. <strong
+          >Tap one</strong
+        > to hear it pronounced (with a karaoke-style highlight) and to open its card
+        — segmentation, gloss, description and the build from root to word. Tap a single
+        <em>morpheme</em> for its own quick info. Two cards are embedded directly in
+        the next section so the format is clear before you start clicking.
+      </p>
+    </div>
+
+    <hr class="sec" />
+
+    <p>
+      Tamil is a well-known example of a highly <span class="term" tabindex="0">agglutinative<span class="termpop">A language that builds words by stacking morphemes, each carrying one clean piece of grammar.</span></span>
+      language: it builds grammatical meaning by suffixing <span class="term" tabindex="0">morphemes<span class="termpop">The smallest unit of a word that still carries meaning, such as <code>learn</code>, <code>-er</code> or <code>-s</code>.</span></span>
+      (the smallest fragments of a word that carry meaning) onto a root. This is
+      present in English too, but to a much smaller degree. Take the English word
+      <em>learners</em>, which carries three morphemes: the root <code>learn</code>,
+      the derivational suffix <code>-er</code> that turns the verb into a noun, and the
+      plural inflection <code>-s</code>. Splitting a word into its morphemes is
+      <span class="term" tabindex="0">segmentation<span class="termpop">Splitting a word into its individual morphemes.</span></span>; labelling what each one <em>does</em> is
+      <span class="term" tabindex="0">glossing<span class="termpop">Labelling what each morpheme does, such as <code>PAST</code>, <code>1SG</code> or <code>COMPL</code>.</span></span>; chaining them from the root outward is the
+      <span class="term" tabindex="0">build<span class="termpop">Chaining the morphemes from the root outward to show how the word is assembled.</span></span>. Tamil does the same, only it stacks far more. Below, side by side, are <em
+        >learners</em
+      > and the spoken-Tamil word for <em>those who are studying</em>, on the same <span
+        class="ta">படி</span
+      > "study" root we'll use throughout, each shown as one of the app's cards:
+    </p>
+
+    <div class="cardpair">
+      <div class="cardslot" data-w="learners"></div>
+      <div class="cardslot" data-w="படிக்கிறவங்க"></div>
+    </div>
+
+    <p>
+      Both cards work the same way. Tap the word to hear it, tap any single piece
+      for its own quick note, and the build shows how each grows from its root outward.
+      English stacks three morphemes; spoken Tamil stacks four: the present stem,
+      an adjectival <span class="term" tabindex="0">participle<span class="termpop">A non-finite verb form that lets a verb behave like an adjective or adverb instead of the main verb of the clause.</span></span> that turns the verb into "(the one) who is studying",
+      and an <span class="term" tabindex="0">animate<span class="termpop">A grammatical category for words referring to people or animals, as opposed to inanimate things; Tamil treats the two differently.</span></span>-plural pronoun head folded onto the end. Tamil goes much further
+      than this, to the point of folding an entire clause into a single word. Here is
+      <em>"if one has to go and study"</em>: a purpose <span class="term" tabindex="0">infinitive<span class="termpop">The untensed base form of a verb. A purpose infinitive marks the aim of an action, <em>in order to</em> do something.</span></span>,
+      a motion verb, a necessity <span class="term" tabindex="0">modal<span class="termpop">An element expressing necessity, possibility or obligation rather than the action itself; here the necessity modal, <em>has to</em>.</span></span>, and a <span class="term" tabindex="0">conditional<span class="termpop">A verb form marking an <em>if</em> clause: the condition under which the rest holds.</span></span>, all welded together:
+    </p>
+
+    <div class="cardslot" data-w="படிக்கப்போகணும்னா"></div>
+
+    <p>
+      Five morphemes, and not one survives as a clean slice. The necessity modal
+      even deletes its own first syllable (<span class="ta">வேணும் → ணும்</span>),
+      and the conditional rides on it because the modal has no past stem of its own.
+      This is the kind of complexity the analyser has to handle. The single word the
+      rest of the series follows, the one we feed to the system and watch it analyse,
+      is <em>"I've studied it, and it's done"</em>:
+    </p>
+
+    <div class="cardslot" data-w="படிச்சிட்டேன்"></div>
+
+    <p>
+      One word, four morphemes: the verb <span class="ta">படி</span> "study", a participle,
+      the <span class="term" tabindex="0">completive<span class="termpop">An aspect that marks an action as definitely completed; in spoken Tamil it rides on an auxiliary verb fused onto the main one.</span></span> auxiliary <span class="ta">விடு</span> "let go" (which the spoken
+      language strips the <em>v‑</em> from and folds the past tense into), and "I". The
+      speaker's identity, the tense, and a sense of decisive finality are all welded
+      on. The card is open about the awkward part: those morphemes <em
+        >do not survive as separate chunks</em
+      >, because a vowel <span class="term" tabindex="0">elides<span class="termpop">To drop a sound that would otherwise be pronounced. At a morpheme boundary a vowel elides, blurring where one piece ends and the next begins.</span></span> at every join, so you cannot recover them by cutting the
+      string. A learner who taps that word needs every morpheme named, and the system,
+      as we will see, has to name them without ever inventing one.
+    </p>
+
+    <p>
+      The fundamental reason this is so challenging in Tamil is that there is
+      <em>no canonical algorithm</em> for unpacking a spoken <span class="term" tabindex="0">surface form<span class="termpop">The morphemes in the form they appear in after sandhi, rather than their clean underlying forms.</span></span> back into
+      these pieces. Literary Tamil has formal rules and mature analysers; the spoken
+      register has neither. The completive auxiliary <span
+        class="ta">விடு</span
+      > never appears as a clean suffix: in speech it loses its <em>v‑</em>
+      (<span class="ta">விடு → இட்டு</span>) and its vowels elide at every join, which
+      is why the cards above show morphemes that do not cleanly cut out of the string.
+      You cannot recover the pieces with string rules, and there is no lookup table to
+      fall back on. So for a language like this, <span class="term" tabindex="0">segmenting<span class="termpop">Splitting a word into its individual morphemes.</span></span> even a single word remains
+      an open problem.
+    </p>
+
+    <div class="aside">
+      <h4>Terminology</h4>
+      <dl>
+        <dt>Morpheme</dt><dd>
+          Smallest meaningful unit. English: <code>learn</code>, <code>-er</code>,
+          <code>-s</code>. Tamil: <span class="ta">‑ச்சு</span> (AVP), <span
+            class="ta">‑ஏன்</span
+          > ("I").
+        </dd>
+        <dt>Root</dt><dd>
+          The lexical core a word is built on. Here: <span class="ta">படி</span> "study".
+        </dd>
+        <dt>Gloss</dt><dd>
+          A short standardised label for a morpheme's job. <code>PAST</code>, <code
+            >1SG</code
+          > (1st person singular), <code>COMPL</code> (completive).
+        </dd>
+        <dt>Agglutinative</dt><dd>
+          A language that builds words by stacking morphemes, each carrying one clean
+          piece of grammar.
+        </dd>
+        <dt>AVP</dt><dd>
+          Adverbial / verbal participle — a non-finite "having ___ed" form. <span
+            class="ta">படிச்சு</span
+          > = "having studied". Tamil uses it to chain actions.
+        </dd>
+        <dt>Aspect</dt><dd>
+          Not <em>when</em> an action happened (that's tense) but <em>how</em> it's
+          viewed — completed, ongoing, habitual. <code>COMPL</code> = viewed as definitely
+          completed.
+        </dd>
+        <dt>Sandhi</dt><dd>
+          Sound changes at morpheme boundaries. <span class="ta">படி</span>+<span
+            class="ta">ச்சு</span
+          > doesn't stay neatly separable — the join mutates. The system tracks an <em
+            >underlying</em
+          > form (the clean morphemes) and a <em>surface</em> form (what's actually pronounced).
+        </dd>
+      </dl>
+    </div>
+
+    <div class="callout">
+      <span class="tag">Next in the series</span>
+      <p>
+        So you reach for the one tool that is good with unfamiliar strings: a large language
+        model. Hand it <span class="ta">படிச்சிட்டேன்</span> and ask it to break the word
+        down, and it answers fluently, confidently, and differently every time you
+        ask. That inconsistency is the problem. <strong
+          >Part&nbsp;2: <a href="/blog/morphology-tamil/where-llms-go-wrong"
+            >Where a language model goes wrong</a
+          >.</strong
+        >
+      </p>
+    </div>
+  </div><!-- /wrap -->
+</BlogPostLayout>

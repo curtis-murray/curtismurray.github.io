@@ -9,7 +9,8 @@ import TypeOnView from "./TypeOnView.jsx";
 ---
 
 <footer
-  class="relative mt-16 bg-neutral text-neutral-content rounded-t-[2.5rem] overflow-hidden"
+  id="contact"
+  class="relative mt-16 bg-neutral text-neutral-content rounded-t-[2.5rem] overflow-hidden scroll-mt-24"
 >
   <div class="container mx-auto px-6 lg:px-16 py-16 sm:py-24">
     <div class="io-reveal max-w-3xl">
@@ -31,20 +32,15 @@ import TypeOnView from "./TypeOnView.jsx";
       </a>
     </div>
 
+    <p class="io-reveal mt-12 max-w-2xl text-base sm:text-lg leading-relaxed opacity-80">
+      not hiring? stay a while — <a href="/the-grind/" class="text-[#f2a594] font-medium underline underline-offset-4 decoration-[#f2a594]/50 hover:decoration-[#f2a594] transition-colors">judge my life choices</a>, <a href="/blog/" class="text-[#f2a594] font-medium underline underline-offset-4 decoration-[#f2a594]/50 hover:decoration-[#f2a594] transition-colors">read a post</a>, or just <a href="/photography/" class="text-[#f2a594] font-medium underline underline-offset-4 decoration-[#f2a594]/50 hover:decoration-[#f2a594] transition-colors">stop for some photos of birds</a>.
+    </p>
+
     <div
-      class="mt-14 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium"
+      class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium"
     >
-      <a
-        href="/Curtis_Murray_Resume.pdf"
-        download
-        class="rounded-full bg-neutral-content/15 px-5 py-2.5 hover:bg-neutral-content/25 transition-colors"
-      >
-        Download résumé
-      </a>
-      <a href={linkedIn} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">LinkedIn</a>
-      <a href={scholar} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">Google Scholar</a>
-      <a href="/projects/" class="opacity-80 hover:opacity-100 transition-opacity">Projects</a>
-      <a href="/photography/" class="opacity-80 hover:opacity-100 transition-opacity">Photography</a>
+      <a href={linkedIn} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">be an edge in my network</a>
+      <a href={scholar} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">cite my papers????</a>
     </div>
 
     <div
