@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { LuChevronsDown, LuSparkles, LuSparkle } from "react-icons/lu";
 import PdfModal from "./PdfModal.jsx";
+import { track } from "../lib/track.js";
 
 // The grind's dramatic single-screen opening. "the grind" types itself, then the
 // rest of the hero fades up: the understated "boring pdf" floating in the middle
@@ -114,6 +115,7 @@ export default function GrindIntro() {
 
   const onTour = (e) => {
     e.preventDefault();
+    track("resume_choice", { choice: "scenic_tour" });
     revealJourney(true);
   };
 
@@ -173,7 +175,11 @@ export default function GrindIntro() {
         >
           <button
             type="button"
-            onClick={() => setPdfOpen(true)}
+            onClick={() => {
+              track("resume_choice", { choice: "boring_pdf" });
+              track("resume_opened", { source: "grind_boring_pdf" });
+              setPdfOpen(true);
+            }}
             className="group inline-flex flex-col items-center gap-2 text-sm text-base-content/55 hover:text-primary transition-colors"
             aria-label="open the boring pdf"
           >

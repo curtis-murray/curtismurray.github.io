@@ -2,6 +2,7 @@ import { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
 import { LuSparkles } from "react-icons/lu";
 import PdfModal from "./PdfModal.jsx";
+import { track } from "../lib/track.js";
 
 // The résumé page opens on a self-aware choice: the dull PDF, or the vibe-coded
 // live page. Picking "vibe coded" reveals the merged content (#grind-content,
@@ -12,6 +13,7 @@ export default function WouldYouRather() {
   const [revealed, setRevealed] = useState(false);
 
   const reveal = () => {
+    track("resume_choice", { choice: "vibe_coded" });
     setRevealed(true);
     const el = document.getElementById("grind-content");
     if (!el) return;
@@ -34,7 +36,11 @@ export default function WouldYouRather() {
         {/* The boring one — deliberately drab. */}
         <button
           type="button"
-          onClick={() => setPdfOpen(true)}
+          onClick={() => {
+            track("resume_choice", { choice: "boring_pdf" });
+            track("resume_opened", { source: "would_you_rather" });
+            setPdfOpen(true);
+          }}
           className="group text-left rounded-2xl bg-base-200/40 ring-1 ring-base-300/60 px-5 py-5 transition-all duration-300 hover:ring-base-content/30 hover:bg-base-200/60"
         >
           <span className="flex items-center gap-2 text-base-content/60">

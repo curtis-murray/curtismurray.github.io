@@ -61,8 +61,8 @@
         root.classList.add("reveal-on");
       })();
     </script>
-    <script>(function(){const posthogKey = "phc_7JPx8axQMLLglYnDAmiBR2EupAh0NRZiLLKWR0hIq6a";
-const posthogHost = "https://us.i.posthog.com";
+    <script>(function(){const posthogKey = "phc_mmFcvpT3MphzKCJGjFzjr4tkNcMcKpUsasYbQ9JTwZG8";
+const posthogHost = "https://app.posthog.com";
 
           {`!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);posthog.init(posthogKey,{api_host:posthogHost,person_profiles:"identified_only"});`}
         })();</script>
@@ -597,6 +597,8 @@ const posthogHost = "https://us.i.posthog.com";
   </div>
 
 
+  <div id="blog-end" data-post="/blog/morphology-tamil/what-it-takes/" aria-hidden="true"></div>
+
   <nav class="series-nav">
     <a class="prev" href="/blog/morphology-tamil/admit-it-doesnt-know">
           <span class="dir">← Part 3</span>
@@ -608,6 +610,27 @@ const posthogHost = "https://us.i.posthog.com";
           <span class="ttl">Part 1 · What is morphological analysis?</span>
         </a>
   </nav>
+
+  <script>
+    // Fire blog_post_completed once when the end-of-article sentinel is reached.
+    (function () {
+      var s = document.getElementById("blog-end");
+      if (!s || !("IntersectionObserver" in window)) return;
+      var fired = false;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && !fired && window.posthog) {
+            fired = true;
+            window.posthog.capture("blog_post_completed", {
+              post: s.getAttribute("data-post"),
+            });
+            io.disconnect();
+          }
+        });
+      });
+      io.observe(s);
+    })();
+  </script>
 
   <script src="/blog/morphology-tamil/audio-data.js"></script>
   <script src="/blog/morphology-tamil/shared/morphology-data.js"></script>
@@ -624,7 +647,7 @@ const posthogHost = "https://us.i.posthog.com";
       <h2 class="font-slab font-bold text-4xl sm:text-5xl tracking-tight lowercase">
         <script>(()=>{var r=(i,c,n)=>{let s=async()=>{await(await i())()},t=new IntersectionObserver(e=>{for(let o of e)if(o.isIntersecting){t.disconnect(),s();break}});for(let e of n.children)t.observe(e)};(self.Astro||(self.Astro={})).visible=r;window.dispatchEvent(new Event("astro:visible"));})();</script><astro-island uid="ZHHd6X" prefix="r2" component-url="/_astro/TypeOnView.fbfd4902.js" component-export="default" renderer-url="/_astro/client.fe332669.js" props="{&quot;text&quot;:[0,&quot;let&#39;s build something you can trust.&quot;]}" ssr="" client="visible" opts="{&quot;name&quot;:&quot;TypeOnView&quot;,&quot;value&quot;:true}" await-children=""><span class="relative block"><span class="invisible" aria-hidden="true">let&#x27;s build something you can trust.</span><span class="absolute inset-0"><span class="type-caret" aria-hidden="true"></span></span></span></astro-island>
       </h2>
-      <a href="mailto:curtis@curtismurray.tech" class="group inline-flex items-center gap-3 mt-8 text-xl sm:text-2xl font-medium underline-offset-8 hover:underline">
+      <a href="mailto:curtis@curtismurray.tech" data-ph-event="contact_email_click" class="group inline-flex items-center gap-3 mt-8 text-xl sm:text-2xl font-medium underline-offset-8 hover:underline">
         curtis@curtismurray.tech
         <span aria-hidden="true" class="transition-transform group-hover:translate-x-1">→</span>
       </a>
@@ -635,8 +658,8 @@ const posthogHost = "https://us.i.posthog.com";
     </p>
 
     <div class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium">
-      <a href="https://www.linkedin.com/in/curtiswmurray/" target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">be an edge in my network</a>
-      <a href="https://scholar.google.com.au/citations?user=25fFcUUAAAAJ&#38;hl=en&#38;oi=ao" target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">cite my papers????</a>
+      <a href="https://www.linkedin.com/in/curtiswmurray/" target="_blank" rel="noopener noreferrer" data-ph-event="contact_link_click" data-ph-network="linkedin" class="opacity-80 hover:opacity-100 transition-opacity">be an edge in my network</a>
+      <a href="https://scholar.google.com.au/citations?user=25fFcUUAAAAJ&#38;hl=en&#38;oi=ao" target="_blank" rel="noopener noreferrer" data-ph-event="contact_link_click" data-ph-network="scholar" class="opacity-80 hover:opacity-100 transition-opacity">cite my papers????</a>
     </div>
 
     <div class="mt-14 pt-6 border-t border-neutral-content/15 flex flex-wrap justify-between gap-4 text-xs opacity-60">
@@ -645,6 +668,22 @@ const posthogHost = "https://us.i.posthog.com";
     </div>
   </div>
 </footer>
+
+<script>
+  // Wire footer contact links to PostHog (window.posthog from Layout's snippet).
+  // data-ph-event names the event; data-ph-network adds a property. Guarded so
+  // it no-ops when PostHog is absent (adblock / no key).
+  document.querySelectorAll("#contact [data-ph-event]").forEach((el) => {
+    el.addEventListener("click", () => {
+      if (!window.posthog) return;
+      const network = el.getAttribute("data-ph-network");
+      window.posthog.capture(
+        el.getAttribute("data-ph-event"),
+        network ? { network } : undefined
+      );
+    });
+  });
+</script>
           </main>
     </div>
     

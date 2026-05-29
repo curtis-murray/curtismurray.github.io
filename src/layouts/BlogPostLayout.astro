@@ -32,6 +32,10 @@ const base = "/blog/morphology-tamil";
 <Layout title={title} description={description}>
   <slot />
 
+  {/* Completion sentinel: sits at the end of the article body. When it scrolls
+      into view we fire blog_post_completed once — a proxy for "read to the end". */}
+  <div id="blog-end" data-post={Astro.url.pathname} aria-hidden="true"></div>
+
   <nav class="series-nav">
     {
       prev && (
@@ -51,6 +55,27 @@ const base = "/blog/morphology-tamil";
       )
     }
   </nav>
+
+  <script is:inline>
+    // Fire blog_post_completed once when the end-of-article sentinel is reached.
+    (function () {
+      var s = document.getElementById("blog-end");
+      if (!s || !("IntersectionObserver" in window)) return;
+      var fired = false;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting && !fired && window.posthog) {
+            fired = true;
+            window.posthog.capture("blog_post_completed", {
+              post: s.getAttribute("data-post"),
+            });
+            io.disconnect();
+          }
+        });
+      });
+      io.observe(s);
+    })();
+  </script>
 
   <script is:inline src={`${base}/audio-data.js`}></script>
   <script is:inline src={`${base}/shared/morphology-data.js`}></script>

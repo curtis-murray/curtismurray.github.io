@@ -22,6 +22,7 @@ import TypeOnView from "./TypeOnView.jsx";
       </h2>
       <a
         href={`mailto:${email}`}
+        data-ph-event="contact_email_click"
         class="group inline-flex items-center gap-3 mt-8 text-xl sm:text-2xl font-medium underline-offset-8 hover:underline"
       >
         {email}
@@ -39,8 +40,8 @@ import TypeOnView from "./TypeOnView.jsx";
     <div
       class="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 text-sm font-medium"
     >
-      <a href={linkedIn} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">be an edge in my network</a>
-      <a href={scholar} target="_blank" rel="noopener noreferrer" class="opacity-80 hover:opacity-100 transition-opacity">cite my papers????</a>
+      <a href={linkedIn} target="_blank" rel="noopener noreferrer" data-ph-event="contact_link_click" data-ph-network="linkedin" class="opacity-80 hover:opacity-100 transition-opacity">be an edge in my network</a>
+      <a href={scholar} target="_blank" rel="noopener noreferrer" data-ph-event="contact_link_click" data-ph-network="scholar" class="opacity-80 hover:opacity-100 transition-opacity">cite my papers????</a>
     </div>
 
     <div
@@ -51,3 +52,19 @@ import TypeOnView from "./TypeOnView.jsx";
     </div>
   </div>
 </footer>
+
+<script is:inline>
+  // Wire footer contact links to PostHog (window.posthog from Layout's snippet).
+  // data-ph-event names the event; data-ph-network adds a property. Guarded so
+  // it no-ops when PostHog is absent (adblock / no key).
+  document.querySelectorAll("#contact [data-ph-event]").forEach((el) => {
+    el.addEventListener("click", () => {
+      if (!window.posthog) return;
+      const network = el.getAttribute("data-ph-network");
+      window.posthog.capture(
+        el.getAttribute("data-ph-event"),
+        network ? { network } : undefined
+      );
+    });
+  });
+</script>

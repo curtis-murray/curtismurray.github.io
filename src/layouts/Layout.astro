@@ -23,12 +23,17 @@ const ogImageAlt = "Curtis Murray — AI Engineer, PhD, Melbourne";
 // PostHog product analytics: autocapture (clicks/forms) + session replay.
 // Only loads when PUBLIC_POSTHOG_KEY is set — so local dev (no key) stays clean
 // and the snippet ships only when the production build supplies the key.
-// Host defaults to US cloud; the snippet derives the assets host from it, so
-// it must be the `*.i.posthog.com` ingestion host (set PUBLIC_POSTHOG_HOST to
-// https://eu.i.posthog.com for an EU project).
+// Host defaults to app.posthog.com (US cloud). For an EU project set
+// PUBLIC_POSTHOG_HOST to https://eu.i.posthog.com.
 const posthogKey = import.meta.env.PUBLIC_POSTHOG_KEY;
+// Default to app.posthog.com (matches the sibling Ellytails site, confirmed
+// working on this same project key). The raw us.i.posthog.com ingestion host is
+// on common ad/tracker blocklists (*.i.posthog.com), which silently drops
+// events; app.posthog.com routes to the same US cloud and slips through.
+// `||` not `??`: an unset GitHub Actions variable injects an empty string (not
+// undefined), and `??` would keep that "" and break PostHog's api_host in prod.
 const posthogHost =
-  import.meta.env.PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com";
+  import.meta.env.PUBLIC_POSTHOG_HOST || "https://app.posthog.com";
 ---
 
 <!DOCTYPE html>

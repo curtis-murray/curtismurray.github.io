@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaFilePdf } from "react-icons/fa";
 import PdfModal from "./PdfModal.jsx";
+import { track } from "../lib/track.js";
 
 // Small, tasteful "prefer the boring pdf?" trigger. The base markup is a real
 // anchor to the PDF, so it works before hydration and with JS off; once
@@ -14,6 +15,7 @@ export default function PdfLink() {
         href="/Curtis_Murray_Resume.pdf"
         onClick={(e) => {
           e.preventDefault();
+          track("resume_opened", { source: "hurry_link" });
           setOpen(true);
         }}
         className="group inline-flex items-center gap-2 text-sm text-base-content/55 hover:text-primary transition-colors"

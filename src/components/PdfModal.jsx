@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaDownload, FaExternalLinkAlt } from "react-icons/fa";
+import { track } from "../lib/track.js";
 
 const PDF = "/Curtis_Murray_Resume.pdf";
 
@@ -47,6 +48,7 @@ export default function PdfModal({ open, onClose }) {
                 <a
                   href={PDF}
                   download
+                  onClick={() => track("resume_downloaded")}
                   className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-base-content/70 hover:text-primary hover:bg-base-200/70 transition-colors"
                 >
                   <FaDownload className="text-[0.9em]" /> download
@@ -55,6 +57,7 @@ export default function PdfModal({ open, onClose }) {
                   href={PDF}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => track("resume_opened_in_tab")}
                   className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium text-base-content/70 hover:text-primary hover:bg-base-200/70 transition-colors"
                 >
                   <FaExternalLinkAlt className="text-[0.85em]" /> open in tab
