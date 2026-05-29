@@ -11,7 +11,15 @@ import { SEO } from "astro-seo";
 import config from "../config/config.json";
 // `story` pages (the home) render full-bleed over the mountains; every other
 // route renders inside a centred, translucent base-100 panel.
-const { title, description, story = false } = Astro.props;
+const { title, description, story = false, image } = Astro.props;
+// Canonical URL + absolute OG/Twitter image. Pages may pass their own `image`
+// (e.g. a per-post card); everything else falls back to the site-wide card.
+// Social scrapers (LinkedIn, X, Slack) require absolute URLs, hence Astro.site.
+const metaDescription = description ? description : config.metadata.meta_description;
+const pageTitle = title ? title : config.site.title;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image ?? "/og/og-default.png", Astro.site).href;
+const ogImageAlt = "Curtis Murray — AI Engineer, PhD, Melbourne";
 // PostHog product analytics: autocapture (clicks/forms) + session replay.
 // Only loads when PUBLIC_POSTHOG_KEY is set — so local dev (no key) stays clean
 // and the snippet ships only when the production build supplies the key.
@@ -27,7 +35,34 @@ const posthogHost =
 <html lang="en">
   <head>
     <SEO
-      title={`${title ? title : config.site.title}`}
+      title={pageTitle}
+      description={metaDescription}
+      canonical={canonical}
+      openGraph={{
+        basic: {
+          title: pageTitle,
+          type: "website",
+          image: ogImage,
+          url: canonical,
+        },
+        optional: {
+          description: metaDescription,
+          siteName: "Curtis Murray",
+          locale: "en_AU",
+        },
+        image: {
+          alt: ogImageAlt,
+          width: 1200,
+          height: 600,
+        },
+      }}
+      twitter={{
+        card: "summary_large_image",
+        title: pageTitle,
+        description: metaDescription,
+        image: ogImage,
+        imageAlt: ogImageAlt,
+      }}
       extend={{
         link: [
           { rel: "shortcut icon", href: `${config.site.favicon}` },
@@ -71,12 +106,6 @@ const posthogHost =
           {
             name: "msapplication-config",
             content: "/assets/favicons/browserconfig.xml",
-          },
-          {
-            name: "description",
-            content: `{${
-              description ? description : config.metadata.meta_description
-            }}`,
           },
         ],
       }}
