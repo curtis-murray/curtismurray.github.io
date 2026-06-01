@@ -22,14 +22,16 @@ interface NavLink {
 interface Props {
   title: string;
   description?: string;
+  image?: string;
+  imageAlt?: string;
   prev?: NavLink;
   next?: NavLink;
 }
-const { title, description, prev, next } = Astro.props;
+const { title, description, image, imageAlt, prev, next } = Astro.props;
 const base = "/blog/morphology-tamil";
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} image={image} imageAlt={imageAlt}>
   <slot />
 
   {/* Completion sentinel: sits at the end of the article body. When it scrolls
