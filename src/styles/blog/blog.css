@@ -142,6 +142,14 @@ hr.sec{border:0;border-top:1px solid var(--line);margin:50px 0}
 .fn:hover .fnpop,.fn:focus-within .fnpop,
 .term:hover .termpop,.term:focus-within .termpop{opacity:1;visibility:visible;
     transform:translateX(-50%) translateY(0);pointer-events:auto}
+/* narrow screens: term-centred popups overflow the viewport sides, so pin them
+   to the viewport as a bottom sheet where they can't run off-screen */
+@media (max-width:640px){
+    .fnpop,.termpop{position:fixed;left:12px;right:12px;bottom:14px;top:auto;
+        width:auto;max-width:none;transform:translateY(8px)}
+    .fn:hover .fnpop,.fn:focus-within .fnpop,
+    .term:hover .termpop,.term:focus-within .termpop{transform:translateY(0)}
+}
 
 /* ---- series navigation (prev · hub · next), shared across posts ---- */
 .series-nav{max-width:680px;margin:54px auto 0;padding-top:22px;border-top:1px solid var(--line);
